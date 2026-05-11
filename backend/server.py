@@ -1,15 +1,19 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, Query
 from fastapi.responses import RedirectResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import secrets
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+import bcrypt
+import jwt
+from datetime import datetime, timezone, timedelta
 
 
 ROOT_DIR = Path(__file__).parent
@@ -19,11 +23,63 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@ezhome.shop')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'ezhome-admin-2026')
-ADMIN_TOKEN = os.environ.get('ADMIN_TOKEN', 'ezhome-secret-admin-token')
+JWT_SECRET = os.environ.get('JWT_SECRET', 'change-me-in-production-' + secrets.token_hex(16))
+JWT_ALGO = "HS256"
+ACCESS_TOKEN_TTL_MIN = 60  # 1 hour
+LOGIN_MAX_ATTEMPTS = 5
+LOGIN_LOCKOUT_MIN = 15
 
 app = FastAPI(title="EzHome Affiliate API")
 api_router = APIRouter(prefix="/api")
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+# ============== AUTH HELPERS ==============
+def hash_password(plain: str) -> str:
+    return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except Exception:
+        return False
+
+
+def create_access_token(user_id: str, email: str) -> str:
+    payload = {
+        "sub": user_id,
+        "email": email,
+        "type": "access",
+        "iat": datetime.now(timezone.utc),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_TTL_MIN),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGO)
+
+
+def decode_token(token: str) -> dict:
+    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+
+
+async def get_current_admin(
+    creds: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
+) -> dict:
+    if not creds or not creds.credentials:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = decode_token(creds.credentials)
+        if payload.get("type") != "access":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    user = await db.admin_users.find_one({"id": payload["sub"]}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
 
 
 # ============== MODELS ==============
@@ -113,26 +169,75 @@ class ContactMessage(BaseModel):
 
 
 class AdminLogin(BaseModel):
+    email: EmailStr
     password: str
 
 
+class AdminUser(BaseModel):
+    id: str
+    email: EmailStr
+    name: str = "Admin"
+    role: str = "admin"
+
+
 class AdminLoginResponse(BaseModel):
-    token: str
+    access_token: str
+    token_type: str = "Bearer"
+    user: AdminUser
 
 
-# ============== AUTH ==============
-async def require_admin(x_admin_token: Optional[str] = Header(None)):
-    if x_admin_token != ADMIN_TOKEN:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    return True
+# ---------- Banner / SiteSettings ----------
+class Banner(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    subtitle: str = ""
+    image_url: str
+    cta_text: str = "Shop Now"
+    cta_link: str = "/products"
+    position: str = "hero"  # hero | promo | featured
+    order: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-# ============== HELPERS ==============
-def _serialize_product_doc(doc: dict) -> dict:
-    if 'created_at' in doc and isinstance(doc['created_at'], datetime):
-        doc['created_at'] = doc['created_at'].isoformat()
-    return doc
+class BannerCreate(BaseModel):
+    title: str
+    subtitle: str = ""
+    image_url: str
+    cta_text: str = "Shop Now"
+    cta_link: str = "/products"
+    position: str = "hero"
+    order: int = 0
+    is_active: bool = True
 
+
+class BannerUpdate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    image_url: Optional[str] = None
+    cta_text: Optional[str] = None
+    cta_link: Optional[str] = None
+    position: Optional[str] = None
+    order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class SiteSettings(BaseModel):
+    announcement_text: str = "FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY"
+    hero_overline: str = "The Curated Home, Reimagined"
+    hero_eyebrow_enabled: bool = True
+    newsletter_enabled: bool = True
+    countdown_enabled: bool = True
+    updated_at: Optional[datetime] = None
+
+
+class SiteSettingsUpdate(BaseModel):
+    announcement_text: Optional[str] = None
+    hero_overline: Optional[str] = None
+    hero_eyebrow_enabled: Optional[bool] = None
+    newsletter_enabled: Optional[bool] = None
+    countdown_enabled: Optional[bool] = None
 
 # ============== ROUTES ==============
 @api_router.get("/")
@@ -177,7 +282,7 @@ async def get_product(product_id: str):
 
 
 @api_router.post("/products", response_model=Product)
-async def create_product(payload: ProductCreate, _: bool = Depends(require_admin)):
+async def create_product(payload: ProductCreate, _: dict = Depends(get_current_admin)):
     product = Product(**payload.model_dump())
     doc = product.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -186,7 +291,7 @@ async def create_product(payload: ProductCreate, _: bool = Depends(require_admin
 
 
 @api_router.patch("/products/{product_id}", response_model=Product)
-async def update_product(product_id: str, payload: ProductUpdate, _: bool = Depends(require_admin)):
+async def update_product(product_id: str, payload: ProductUpdate, _: dict = Depends(get_current_admin)):
     updates = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -198,7 +303,7 @@ async def update_product(product_id: str, payload: ProductUpdate, _: bool = Depe
 
 
 @api_router.delete("/products/{product_id}")
-async def delete_product(product_id: str, _: bool = Depends(require_admin)):
+async def delete_product(product_id: str, _: dict = Depends(get_current_admin)):
     res = await db.products.delete_one({"id": product_id})
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -237,7 +342,7 @@ async def click_redirect(product_id: str):
 
 
 @api_router.get("/admin/stats")
-async def admin_stats(_: bool = Depends(require_admin)):
+async def admin_stats(_: dict = Depends(get_current_admin)):
     total_products = await db.products.count_documents({})
     total_clicks = await db.clicks.count_documents({})
     total_subs = await db.newsletter.count_documents({})
@@ -275,12 +380,137 @@ async def contact(payload: ContactCreate):
     return {"ok": True}
 
 
-# ----- Admin -----
-@api_router.post("/admin/login", response_model=AdminLoginResponse)
-async def admin_login(payload: AdminLogin):
-    if payload.password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=401, detail="Invalid password")
-    return AdminLoginResponse(token=ADMIN_TOKEN)
+# ----- Auth -----
+async def _check_brute_force(identifier: str) -> None:
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=LOGIN_LOCKOUT_MIN)
+    attempts = await db.login_attempts.count_documents({
+        "identifier": identifier,
+        "ts": {"$gte": cutoff.isoformat()},
+        "success": False,
+    })
+    if attempts >= LOGIN_MAX_ATTEMPTS:
+        raise HTTPException(status_code=429, detail=f"Too many attempts. Try again in {LOGIN_LOCKOUT_MIN} minutes.")
+
+
+async def _log_attempt(identifier: str, success: bool) -> None:
+    await db.login_attempts.insert_one({
+        "identifier": identifier,
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "success": success,
+    })
+
+
+@api_router.post("/auth/login", response_model=AdminLoginResponse)
+async def auth_login(payload: AdminLogin, request: Request):
+    ip = request.client.host if request.client else "unknown"
+    identifier = f"{ip}:{payload.email.lower()}"
+    await _check_brute_force(identifier)
+
+    user = await db.admin_users.find_one({"email": payload.email.lower()})
+    if not user or not verify_password(payload.password, user.get("password_hash", "")):
+        await _log_attempt(identifier, False)
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    await _log_attempt(identifier, True)
+    # purge old successful attempts older than 1 day
+    await db.login_attempts.delete_many({"identifier": identifier, "success": True})
+
+    token = create_access_token(user["id"], user["email"])
+    return AdminLoginResponse(
+        access_token=token,
+        user=AdminUser(id=user["id"], email=user["email"], name=user.get("name", "Admin"), role=user.get("role", "admin")),
+    )
+
+
+@api_router.get("/auth/me", response_model=AdminUser)
+async def auth_me(current: dict = Depends(get_current_admin)):
+    return AdminUser(id=current["id"], email=current["email"], name=current.get("name", "Admin"), role=current.get("role", "admin"))
+
+
+@api_router.post("/auth/logout")
+async def auth_logout(_: dict = Depends(get_current_admin)):
+    # Client-side token clearing; no server-side state for JWT
+    return {"ok": True}
+
+
+# ----- Banners -----
+@api_router.get("/banners", response_model=List[Banner])
+async def list_banners(active: Optional[bool] = None, position: Optional[str] = None):
+    q = {}
+    if active is not None:
+        q["is_active"] = active
+    if position:
+        q["position"] = position
+    docs = await db.banners.find(q, {"_id": 0}).sort("order", 1).to_list(100)
+    return docs
+
+
+@api_router.post("/banners", response_model=Banner)
+async def create_banner(payload: BannerCreate, _: dict = Depends(get_current_admin)):
+    banner = Banner(**payload.model_dump())
+    doc = banner.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.banners.insert_one(doc)
+    return banner
+
+
+@api_router.patch("/banners/{banner_id}", response_model=Banner)
+async def update_banner(banner_id: str, payload: BannerUpdate, _: dict = Depends(get_current_admin)):
+    updates = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    res = await db.banners.update_one({"id": banner_id}, {"$set": updates})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    doc = await db.banners.find_one({"id": banner_id}, {"_id": 0})
+    return doc
+
+
+@api_router.delete("/banners/{banner_id}")
+async def delete_banner(banner_id: str, _: dict = Depends(get_current_admin)):
+    res = await db.banners.delete_one({"id": banner_id})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    return {"ok": True}
+
+
+# ----- Site Settings (singleton) -----
+async def _get_settings_doc() -> dict:
+    doc = await db.site_settings.find_one({"_id": "singleton"}, {"_id": 0})
+    if not doc:
+        default = SiteSettings().model_dump()
+        default['updated_at'] = datetime.now(timezone.utc).isoformat()
+        await db.site_settings.insert_one({"_id": "singleton", **default})
+        return default
+    return doc
+
+
+@api_router.get("/settings", response_model=SiteSettings)
+async def get_settings():
+    doc = await _get_settings_doc()
+    if doc.get('updated_at') and isinstance(doc['updated_at'], str):
+        try:
+            doc['updated_at'] = datetime.fromisoformat(doc['updated_at'])
+        except Exception:
+            doc['updated_at'] = None
+    return doc
+
+
+@api_router.patch("/settings", response_model=SiteSettings)
+async def update_settings(payload: SiteSettingsUpdate, _: dict = Depends(get_current_admin)):
+    updates = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    updates['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.site_settings.update_one({"_id": "singleton"}, {"$set": updates}, upsert=True)
+    doc = await db.site_settings.find_one({"_id": "singleton"}, {"_id": 0})
+    if doc.get('updated_at') and isinstance(doc['updated_at'], str):
+        try:
+            doc['updated_at'] = datetime.fromisoformat(doc['updated_at'])
+        except Exception:
+            doc['updated_at'] = None
+    return doc
+
 
 
 # ----- Seed -----
@@ -366,7 +596,43 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_event():
-    # Auto-seed on startup if empty
+    # Indexes
+    try:
+        await db.admin_users.create_index("email", unique=True)
+        await db.admin_users.create_index("id", unique=True)
+        await db.products.create_index("id", unique=True)
+        await db.products.create_index("category")
+        await db.banners.create_index("position")
+        await db.login_attempts.create_index("identifier")
+        await db.newsletter.create_index("email", unique=True)
+    except Exception as e:
+        logger.warning(f"Index creation: {e}")
+
+    # Seed admin user
+    try:
+        existing = await db.admin_users.find_one({"email": ADMIN_EMAIL.lower()})
+        if not existing:
+            admin_id = str(uuid.uuid4())
+            await db.admin_users.insert_one({
+                "id": admin_id,
+                "email": ADMIN_EMAIL.lower(),
+                "password_hash": hash_password(ADMIN_PASSWORD),
+                "name": "EzHome Admin",
+                "role": "admin",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            logger.info(f"Seeded admin user: {ADMIN_EMAIL}")
+        elif not verify_password(ADMIN_PASSWORD, existing.get("password_hash", "")):
+            # password rotated in env — update hash
+            await db.admin_users.update_one(
+                {"email": ADMIN_EMAIL.lower()},
+                {"$set": {"password_hash": hash_password(ADMIN_PASSWORD)}}
+            )
+            logger.info("Admin password hash refreshed from env")
+    except Exception as e:
+        logger.error(f"Admin seed error: {e}")
+
+    # Auto-seed products if empty
     try:
         count = await db.products.count_documents({})
         if count == 0:
@@ -378,7 +644,7 @@ async def startup_event():
                 await db.products.insert_one(doc)
             logger.info(f"Seeded {len(seed_data)} products")
     except Exception as e:
-        logger.error(f"Seed error: {e}")
+        logger.error(f"Product seed error: {e}")
 
 
 @app.on_event("shutdown")

@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { api } from "../lib/api";
+import { useSettings } from "../lib/settings";
 import { toast } from "sonner";
 
 const NewsletterPopup = () => {
+  const { newsletter_enabled } = useSettings();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!newsletter_enabled) return;
     if (window.location.pathname !== "/") return;
     if (localStorage.getItem("ezhome-newsletter-dismissed")) return;
     if (sessionStorage.getItem("ezhome-newsletter-shown")) return;
@@ -18,7 +21,7 @@ const NewsletterPopup = () => {
       sessionStorage.setItem("ezhome-newsletter-shown", "1");
     }, 14000);
     return () => clearTimeout(t);
-  }, []);
+  }, [newsletter_enabled]);
 
   const close = () => {
     setOpen(false);

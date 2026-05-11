@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Moon, Sun, Menu, X, ShoppingBag } from "lucide-react";
 import { useTheme } from "../lib/theme";
+import { useSettings } from "../lib/settings";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Input } from "./ui/input";
 
@@ -17,6 +18,8 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const { theme, toggle } = useTheme();
+  const settings = useSettings();
+  const announcement_text = settings?.announcement_text || "FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY";
   const [openSearch, setOpenSearch] = useState(false);
   const [q, setQ] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,8 +39,7 @@ const Navbar = () => {
     <>
       {/* Announcement bar */}
       <div className="bg-foreground text-background text-[10px] sm:text-sm py-2 text-center font-medium tracking-wider px-4" data-testid="announcement-bar">
-        <span className="sm:hidden">FREE SHIPPING $50+ · NEW DROPS WEEKLY</span>
-        <span className="hidden sm:inline">FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY</span>
+        {announcement_text}
       </div>
 
       <header

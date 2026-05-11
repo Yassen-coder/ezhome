@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { useSettings } from "../lib/settings";
 import Hero from "../components/Hero";
 import TrustBadges from "../components/TrustBadges";
 import ProductGrid from "../components/ProductGrid";
@@ -8,6 +9,7 @@ import DailyDeals from "../components/DailyDeals";
 import Testimonials from "../components/Testimonials";
 
 const Home = () => {
+  const { countdown_enabled } = useSettings();
   const [data, setData] = useState({ trending: [], bestSellers: [], smartHome: [], kitchen: [], decor: [], organization: [], tiktok: [], fashion: [], deals: [] });
 
   useEffect(() => {
@@ -49,7 +51,7 @@ const Home = () => {
       <ProductGrid title="Trending Now" overline="What's hot this week" subtitle="The pieces flying off shelves. Don't sleep on these." products={data.trending} viewAllLink="/products" />
       <CategoryBento />
       <ProductGrid title="Best Sellers" overline="Customer favorites" products={data.bestSellers} viewAllLink="/products" />
-      {data.deals.length > 0 && <DailyDeals products={data.deals} />}
+      {data.deals.length > 0 && countdown_enabled && <DailyDeals products={data.deals} />}
       <ProductGrid title="Smart Home" overline="Effortless luxury, automated" products={data.smartHome} viewAllLink="/category/smart-home" />
       <ProductGrid title="Kitchen Essentials" overline="For the modern cook" products={data.kitchen} viewAllLink="/category/kitchen" />
       <ProductGrid title="Home Decor" overline="Quietly stunning pieces" products={data.decor} viewAllLink="/category/decor" />

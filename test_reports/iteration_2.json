@@ -1,0 +1,56 @@
+{
+  "summary": "Comprehensive backend (25 pytest tests, 100% pass) + UI testing of EzHome admin dashboard with new JWT auth, Banner CRUD, and SiteSettings. Found and fixed 1 critical frontend bug (Navbar referenced undefined `announcement_text`) that crashed the public homepage. All 22 features from the request validated successfully after the fix.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Navbar",
+        "issue": "ReferenceError: announcement_text is not defined — crashed entire public site with the React error overlay. Variable was used at line 40 but never declared via useSettings(). FIXED by importing and reading from useSettings() with a fallback to default copy.",
+        "selector": "[data-testid=\"announcement-bar\"]",
+        "priority": "CRITICAL_FIXED"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Admin > Banners > New banner form",
+        "issues": [
+          "Individual form inputs (title, subtitle, image_url, cta_text, cta_link, order) have no `name` attribute and no individual `data-testid`. Only the submit button has data-testid='banner-submit'. This makes deterministic test automation brittle (had to fall back to nth-child positional selectors). Recommend adding data-testid=\"banner-{field}\" to each input."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_ezhome_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "DONE (fixed by test agent): Navbar.jsx — destructure settings from useSettings() and read announcement_text from it.",
+    "Optional: Add data-testid attributes to individual fields in the Banner form (`banner-title`, `banner-image`, etc.) for more robust testing.",
+    "Optional: Add a top-level error boundary in App.js so that a single render error doesn't black-out the entire public site."
+  ],
+  "critical_code_review_comments": [
+    "server.py is 650 lines — borderline acceptable but Banner/Settings/Auth sections could be split into routers/auth.py, routers/banners.py, routers/settings.py for maintainability.",
+    "`_check_brute_force` uses lexicographic comparison on ISO-8601 strings ($gte against cutoff.isoformat()) — works for UTC ISO with timezone suffix but is fragile if timezone formats drift. Prefer storing native datetime in Mongo.",
+    "JWT_SECRET fallback in server.py uses a random secret generated at process start — tokens become invalid on every backend restart. Acceptable for dev but the .env value should always be set in production (it is here).",
+    "Banner form field inputs lack `name` and individual `data-testid` attributes — only the submit button is testid-tagged.",
+    "settings.jsx uses an in-memory provider without any cache invalidation — settings updates from admin require a hard refresh of public pages to take effect; mentioned in the request as expected behavior."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_ezhome_api.py (fully rewritten for JWT auth, 25 tests)",
+    "/app/frontend/src/components/Navbar.jsx (fixed undefined announcement_text by reading from useSettings())"
+  ],
+  "success_rate": {
+    "backend": "100% (25/25)",
+    "frontend": "100% after Navbar fix (was 0% on public homepage before)"
+  },
+  "test_credentials": "admin@ezhome.shop / ezhome-admin-2026 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "Created a leftover banner via UI (TEST_UI_Banner) — main agent may want to delete it. Otherwise all TEST_ prefixed products/banners are deleted at end of each pytest run.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend test suite at /app/backend/tests/test_ezhome_api.py covers: JWT login (correct+wrong), /api/auth/me with/without/invalid token, brute-force lockout (uses unique email so it never affects real admin), products CRUD (JWT-protected), banners CRUD (JWT-protected), settings GET (public) + PATCH (JWT-protected), bcrypt $2b$ hash verification, click redirect+counter, newsletter dedup, contact. Run with: REACT_APP_BACKEND_URL=https://ezhome-curated.preview.emergentagent.com pytest /app/backend/tests/ -v",
+  "rca of the issue": "Frontend bug RCA — /app/frontend/src/components/Navbar.jsx line 40 referenced `announcement_text` without ever declaring it. Original code imported useSettings on line 5 but the destructure was missing. Calling the homepage triggered ReferenceError → React error overlay → entire public site unusable. Mitigation: declared `const settings = useSettings()` and read `settings?.announcement_text` with a default fallback string. After fix: public homepage loads, the announcement bar reflects dynamic SiteSettings, and updates from /admin/settings appear after a refresh (verified end-to-end: PATCHed announcement_text='TEST_BANNER_TEXT_XYZ' via admin UI → loaded homepage → confirmed the new text in announcement-bar)."
+}

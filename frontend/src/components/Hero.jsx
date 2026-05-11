@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useSettings } from "../lib/settings";
 
 const Hero = ({ featured = [] }) => {
+  const { hero_overline, hero_eyebrow_enabled } = useSettings();
   const heroImg = "https://images.unsplash.com/photo-1760072513442-9872656c1b07?w=1600&q=85";
   const sideImg1 = featured[0]?.image_url || "https://images.unsplash.com/photo-1778373620793-a369943bf9b3?w=800&q=85";
   const sideImg2 = featured[1]?.image_url || "https://images.unsplash.com/photo-1766431066919-9c11fbb6d3da?w=800&q=85";
@@ -11,9 +13,11 @@ const Hero = ({ featured = [] }) => {
       <div className="container-px mx-auto max-w-[1400px] pt-12 sm:pt-20 pb-16 sm:pb-24 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         {/* Copy */}
         <div className="lg:col-span-6 fade-up">
-          <p className="overline text-muted-foreground mb-5 flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5" /> The Curated Home, Reimagined
-          </p>
+          {hero_eyebrow_enabled && (
+            <p className="overline text-muted-foreground mb-5 flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5" /> {hero_overline}
+            </p>
+          )}
           <h1 className="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-[0.92] tracking-[-0.03em]">
             Live<br />
             <span className="italic font-medium">beautifully.</span><br />
