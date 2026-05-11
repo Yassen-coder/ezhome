@@ -35,8 +35,9 @@ const Navbar = () => {
   return (
     <>
       {/* Announcement bar */}
-      <div className="bg-foreground text-background text-xs sm:text-sm py-2 text-center font-medium tracking-wide" data-testid="announcement-bar">
-        FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY
+      <div className="bg-foreground text-background text-[10px] sm:text-sm py-2 text-center font-medium tracking-wider px-4" data-testid="announcement-bar">
+        <span className="sm:hidden">FREE SHIPPING $50+ · NEW DROPS WEEKLY</span>
+        <span className="hidden sm:inline">FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY</span>
       </div>
 
       <header

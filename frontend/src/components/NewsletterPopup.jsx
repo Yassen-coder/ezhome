@@ -10,8 +10,13 @@ const NewsletterPopup = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (window.location.pathname !== "/") return;
     if (localStorage.getItem("ezhome-newsletter-dismissed")) return;
-    const t = setTimeout(() => setOpen(true), 8000);
+    if (sessionStorage.getItem("ezhome-newsletter-shown")) return;
+    const t = setTimeout(() => {
+      setOpen(true);
+      sessionStorage.setItem("ezhome-newsletter-shown", "1");
+    }, 14000);
     return () => clearTimeout(t);
   }, []);
 

@@ -14,7 +14,7 @@ const Hero = ({ featured = [] }) => {
           <p className="overline text-muted-foreground mb-5 flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5" /> The Curated Home, Reimagined
           </p>
-          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-7xl leading-[0.95] tracking-[-0.03em]">
+          <h1 className="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-[0.92] tracking-[-0.03em]">
             Live<br />
             <span className="italic font-medium">beautifully.</span><br />
             Shop <span className="text-accent">smarter.</span>
@@ -58,17 +58,18 @@ const Hero = ({ featured = [] }) => {
         {/* Bento images */}
         <div className="lg:col-span-6 grid grid-cols-6 grid-rows-6 gap-3 sm:gap-4 h-[420px] sm:h-[560px] fade-up fade-up-delay-2">
           <div className="col-span-4 row-span-4 relative overflow-hidden bg-muted">
-            <img src={heroImg} alt="EzHome hero" className="w-full h-full object-cover" />
-            <div className="absolute bottom-4 left-4 text-background">
+            <img src={heroImg} alt="EzHome hero" loading="eager" fetchPriority="high" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            <div className="absolute bottom-5 left-5 text-white">
               <p className="overline text-[10px] opacity-90">Editor's Pick</p>
               <p className="font-display font-bold text-lg sm:text-xl mt-1">Sanctuary Edit</p>
             </div>
           </div>
           <div className="col-span-2 row-span-2 relative overflow-hidden bg-muted">
-            <img src={sideImg1} alt="Featured" className="w-full h-full object-cover" />
+            <img src={sideImg1} alt="Featured" loading="eager" className="w-full h-full object-cover" />
           </div>
           <div className="col-span-2 row-span-2 relative overflow-hidden bg-muted">
-            <img src={sideImg2} alt="Featured" className="w-full h-full object-cover" />
+            <img src={sideImg2} alt="Featured" loading="eager" className="w-full h-full object-cover" />
           </div>
           <div className="col-span-2 row-span-2 relative overflow-hidden bg-foreground text-background flex flex-col justify-end p-4 sm:p-5">
             <p className="overline text-[10px] opacity-70">New Drop</p>
@@ -87,10 +88,10 @@ const Hero = ({ featured = [] }) => {
       <div className="border-y border-border bg-secondary/40 overflow-hidden py-4 sm:py-5">
         <div className="flex marquee-track whitespace-nowrap">
           {[...Array(2)].map((_, k) => (
-            <div key={k} className="flex items-center gap-12 px-6 shrink-0">
+            <div key={k} className="flex items-center shrink-0">
               {["FREE SHIPPING $50+", "VERIFIED REVIEWS", "AMAZON ASSOCIATE", "TIKTOK FAVORITES", "DAILY NEW DROPS", "SHIPS WORLDWIDE", "30-DAY RETURNS"].map((t) => (
-                <span key={t} className="overline text-xs sm:text-sm flex items-center gap-12">
-                  {t}
+                <span key={t} className="flex items-center">
+                  <span className="overline text-xs sm:text-sm px-8">{t}</span>
                   <span className="w-1 h-1 rounded-full bg-foreground/40" />
                 </span>
               ))}

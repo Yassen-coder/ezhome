@@ -31,7 +31,7 @@ const CategoryBento = () => {
             className={`relative overflow-hidden group ${t.span}`}
             data-testid={`category-tile-${t.slug}`}
           >
-            <img src={t.img} alt={t.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src={t.img} alt={t.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />
             <div className="absolute inset-0 p-5 sm:p-7 flex flex-col justify-end text-background">
               <p className="overline text-[10px] opacity-80">Shop</p>

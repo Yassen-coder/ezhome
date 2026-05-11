@@ -30,6 +30,7 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           src={product.image_url}
           alt={product.title}
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
         {/* Badges */}
@@ -79,9 +80,14 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
 
         {/* Price */}
         <div className="flex items-baseline gap-2 mt-1">
-          <span className="font-display text-xl font-bold">${product.discounted_price.toFixed(2)}</span>
+          <span className="font-display text-2xl font-black tracking-tight">${product.discounted_price.toFixed(2)}</span>
           {product.original_price > product.discounted_price && (
             <span className="text-sm text-muted-foreground line-through">${product.original_price.toFixed(2)}</span>
+          )}
+          {product.original_price > product.discounted_price && (
+            <span className="ml-auto text-[10px] overline text-accent font-bold">
+              SAVE ${(product.original_price - product.discounted_price).toFixed(0)}
+            </span>
           )}
         </div>
 
@@ -90,10 +96,12 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           href={getAffiliateClickUrl(product.id)}
           target="_blank"
           rel="noopener noreferrer sponsored"
-          className="mt-3 inline-flex items-center justify-center px-5 py-3 bg-foreground text-background text-sm font-medium tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:-translate-y-[1px]"
+          aria-label={`${cta} — ${product.title}`}
+          className="group/btn mt-3 inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-foreground text-background text-sm font-semibold tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:-translate-y-[1px]"
           data-testid={`product-cta-${product.id}`}
         >
           {cta}
+          <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
         </a>
       </div>
     </article>
