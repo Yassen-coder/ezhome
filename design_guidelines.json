@@ -1,0 +1,179 @@
+{
+  "theme": "light_and_dark",
+  "archetype": "Hybrid: Organic & Earthy (Light) + Jewel & Luxury (Dark)",
+  "typography": {
+    "heading_font": "Cabinet Grotesk",
+    "body_font": "Satoshi",
+    "font_weights": {
+      "light": "font-light",
+      "regular": "font-normal",
+      "medium": "font-medium",
+      "bold": "font-bold",
+      "black": "font-black"
+    },
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter leading-none",
+      "h2": "text-3xl sm:text-4xl tracking-tight leading-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base sm:text-lg leading-relaxed text-muted-foreground",
+      "small": "text-sm uppercase tracking-[0.2em] font-medium"
+    },
+    "instructions": "Use Cabinet Grotesk for all headings. Use Satoshi for body text. Headings must have tight tracking (`tracking-tight` or `tracking-tighter`). Overlines/labels must be small, uppercase, and have wide tracking (`tracking-[0.2em]`). DO NOT use Inter or Roboto."
+  },
+  "colors": {
+    "light": {
+      "background": "#F9F8F6",
+      "foreground": "#1A1A1A",
+      "card": "#FFFFFF",
+      "card_foreground": "#1A1A1A",
+      "popover": "#FFFFFF",
+      "popover_foreground": "#1A1A1A",
+      "primary": "#1A1A1A",
+      "primary_foreground": "#F9F8F6",
+      "secondary": "#F1EFEA",
+      "secondary_foreground": "#1A1A1A",
+      "muted": "#F1EFEA",
+      "muted_foreground": "#737373",
+      "accent": "#6B705C",
+      "accent_foreground": "#F9F8F6",
+      "destructive": "#8C3A3A",
+      "destructive_foreground": "#FFFFFF",
+      "border": "#E5E3DB",
+      "input": "#E5E3DB",
+      "ring": "#1A1A1A"
+    },
+    "dark": {
+      "background": "#121212",
+      "foreground": "#F9F8F6",
+      "card": "#1A1A1A",
+      "card_foreground": "#F9F8F6",
+      "popover": "#1A1A1A",
+      "popover_foreground": "#F9F8F6",
+      "primary": "#F9F8F6",
+      "primary_foreground": "#121212",
+      "secondary": "#232521",
+      "secondary_foreground": "#F9F8F6",
+      "muted": "#232521",
+      "muted_foreground": "#A3A3A3",
+      "accent": "#A3B18A",
+      "accent_foreground": "#121212",
+      "destructive": "#EF4444",
+      "destructive_foreground": "#FFFFFF",
+      "border": "#2C2C2C",
+      "input": "#2C2C2C",
+      "ring": "#F9F8F6"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous spacing. Utilize wide margins and ample padding to allow products to breathe. A high-end luxury feel comes from negative space, not crowded elements.",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "section_padding": "py-16 sm:py-24",
+    "bento_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8",
+    "card_radius": "rounded-none sm:rounded-md md:rounded-lg",
+    "instructions": "Use grid layouts extensively. For categories, use an asymmetrical bento grid. Images should fill the height of their containers (`object-cover`). Never crowd text. Mobile layout must be flawless as primary traffic is TikTok/IG."
+  },
+  "components": {
+    "buttons": {
+      "style": "Squared or slightly rounded (`rounded-sm`). Solid background, contrasting text.",
+      "hover": "Subtle transform (`-translate-y-[2px]`) and opacity shift or background darkening. Must have explicit hover text color.",
+      "classes": "inline-flex items-center justify-center px-6 py-3 font-medium transition-all duration-300 ease-out focus:ring-2 focus:ring-offset-2"
+    },
+    "cards": {
+      "style": "Minimalist. No heavy drop shadows. Use a subtle 1px border (`border-border`) and pure background.",
+      "hover": "Image zoom effect on hover (`group-hover:scale-105`), subtle lifting of the card."
+    },
+    "navigation": {
+      "style": "Sticky header (`sticky top-0 z-50`), glassmorphism effect (`backdrop-blur-xl bg-background/80`).",
+      "features": "Must include Dark Mode toggle, Search bar, and clean links."
+    },
+    "product_card": {
+      "layout": "Image at top (aspect ratio 4:5 or 1:1), followed by Title, Short Persuasive Desc, Star Rating, Prices (Original crossed out + Discounted), and 'Shop Now' CTA.",
+      "interactions": "Hover reveals secondary image or slight zoom. CTA must be highly visible."
+    }
+  },
+  "visual_enhancers": {
+    "motion": "Smooth, deliberate animations. Fade in on scroll (`framer-motion`), slow image scale on hover. Nothing erratic.",
+    "textures": "Clean, solid colors. In dark mode, use subtle differences in background lightness (`#121212` vs `#1A1A1A`) instead of borders to separate sections where possible.",
+    "badges": "Use small, high-contrast badges for 'Best Seller', 'Viral', '20% OFF' placed in the top-left of product images."
+  },
+  "media": {
+    "hero_section": [
+      {
+        "url": "https://images.unsplash.com/photo-1760072513442-9872656c1b07?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxsdXh1cnklMjBtaW5pbWFsaXN0JTIwbGl2aW5nJTIwcm9vbSUyMGFlc3RoZXRpY3xlbnwwfHx8fDE3Nzg1MzgzMzB8MA&ixlib=rb-4.1.0&q=85",
+        "category": "hero",
+        "description": "Premium living room for main hero background"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1757262798620-c2cc40cfb440?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjBtaW5pbWFsaXN0JTIwbGl2aW5nJTIwcm9vbSUyMGFlc3RoZXRpY3xlbnwwfHx8fDE3Nzg1MzgzMzB8MA&ixlib=rb-4.1.0&q=85",
+        "category": "hero_secondary",
+        "description": "Secondary hero / About Us background"
+      }
+    ],
+    "categories": [
+      {
+        "url": "https://images.unsplash.com/photo-1776919017122-8140e279c889?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAxODF8MHwxfHNlYXJjaHw0fHxzbWFydCUyMGhvbWUlMjBkZXZpY2VzJTIwYWVzdGhldGljfGVufDB8fHx8MTc3ODUzODMzMXww&ixlib=rb-4.1.0&q=85",
+        "category": "category_smart_home",
+        "description": "Smart Home category banner"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1769326541210-86e9d3204496?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODR8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBraXRjaGVuJTIwZ2FkZ2V0cyUyMGFlc3RoZXRpY3xlbnwwfHx8fDE3Nzg1MzgzMjZ8MA&ixlib=rb-4.1.0&q=85",
+        "category": "category_kitchen",
+        "description": "Kitchen Essentials category banner"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1771904489870-e6402dcf91ba?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwaG9tZSUyMGRlY29yJTIwcHJvZHVjdHN8ZW58MHx8fHwxNzc4NTM4MzI2fDA&ixlib=rb-4.1.0&q=85",
+        "category": "category_decor",
+        "description": "Home Decor category banner"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1645848810560-1c6acf9ba847?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwxfHx0aWt0b2slMjBmaW5kcyUyMHRyZW5keSUyMHByb2R1Y3RzfGVufDB8fHx8MTc3ODUzODMzMXww&ixlib=rb-4.1.0&q=85",
+        "category": "category_tiktok",
+        "description": "Viral TikTok Finds category banner"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1769107805528-964f4de0e342?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwY2xvdGhpbmclMjBhZXN0aGV0aWMlMjBuZXV0cmFsfGVufDB8fHx8MTc3ODUzODMyNnww&ixlib=rb-4.1.0&q=85",
+        "category": "category_fashion",
+        "description": "SHEIN Fashion Picks banner"
+      }
+    ],
+    "products": [
+      {
+        "url": "https://images.unsplash.com/photo-1778373620793-a369943bf9b3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHw0fHxtaW5pbWFsaXN0JTIwaG9tZSUyMGRlY29yJTIwcHJvZHVjdHN8ZW58MHx8fHwxNzc4NTM4MzI2fDA&ixlib=rb-4.1.0&q=85",
+        "category": "product_decor_1",
+        "description": "Skincare/decor product shot"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1766431066919-9c11fbb6d3da?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODR8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBraXRjaGVuJTIwZ2FkZ2V0cyUyMGFlc3RoZXRpY3xlbnwwfHx8fDE3Nzg1MzgzMjZ8MA&ixlib=rb-4.1.0&q=85",
+        "category": "product_kitchen_1",
+        "description": "Kitchen product shot"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1764697907425-62696b280b31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w7NTY2Njl8MHwxfHNlYXJjaHwyfHxmYXNoaW9uJTIwY2xvdGhpbmclMjBhZXN0aGV0aWMlMjBuZXV0cmFsfGVufDB8fHx8MTc3ODUzODMyNnww&ixlib=rb-4.1.0&q=85",
+        "category": "product_fashion_1",
+        "description": "Fashion clothing product shot"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1620396748669-46bd3128ccce?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwzfHx0aWt0b2slMjBmaW5kcyUyMHRyZW5keSUyMHByb2R1Y3RzfGVufDB8fHx8MTc3ODUzODMzMXww&ixlib=rb-4.1.0&q=85",
+        "category": "product_tech_1",
+        "description": "Tech/TikTok find product shot"
+      }
+    ]
+  },
+  "testing": {
+    "attributes": "All interactive elements (buttons, links, inputs, form submissions, navigation items, toggle switches, product cards) MUST include a `data-testid` attribute in kebab-case."
+  },
+  "instructions_to_main_agent": [
+    "Install `@phosphor-icons/react` or `lucide-react` for clean, high-end iconography.",
+    "Implement a comprehensive dark mode toggle that respects the color palette exactly as defined. Do NOT use default Tailwind grays. Use the specified custom colors.",
+    "Build a countdown timer for the 'Daily Deals' section. It should look sleek, not spammy.",
+    "For the Bento Grid categories (Smart Home, Kitchen, Decor, Organization, TikTok Finds, Fashion), use the provided category images with a subtle gradient overlay so text remains readable (e.g., `bg-black/30`).",
+    "Product Cards must have a high-converting layout: Image (aspect-square or 4:5), Category overline, Product Title, Short description, Star rating with count, Old price (line-through), New price, and a solid CTA button 'Shop Now'. Include a 'data-testid' on every button.",
+    "Ensure the hero section is visually striking with large typography (`Cabinet Grotesk`), asymmetrical layout, and high-quality imagery.",
+    "Include an Affiliate Disclosure in the footer and a subtle disclaimer near the top or in the About section.",
+    "Do NOT use raw HTML `<select>` or `<input type=\"date\">`. Use Shadcn if needed, but for an ecommerce site, stick to clean custom UI for product selection if variants exist.",
+    "Add a Newsletter Signup popup or section with a sleek, minimalist design.",
+    "Implement smooth scrolling using Lenis if possible, or standard smooth scroll behavior.",
+    "Mobile layout must be prioritized. Buttons should be large enough to tap easily (min 44px height). Padding on mobile should be generous but not waste screen space."
+  ]
+}
