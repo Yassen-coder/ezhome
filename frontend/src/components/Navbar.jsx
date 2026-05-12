@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Input } from "./ui/input";
 
 const NAV_LINKS = [
+  { label: "Home", to: "/" },
   { label: "Shop", to: "/products" },
   { label: "Smart Home", to: "/category/smart-home" },
   { label: "Kitchen", to: "/category/kitchen" },
