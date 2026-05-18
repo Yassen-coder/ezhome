@@ -58,11 +58,11 @@
     "vaul": "^0.9.0",
     "zod": "^3.22.4"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test"
-  },
+ "scripts": {
+  "start": "craco start",
+  "build": "craco build",
+  "test": "craco test"
+},
   "eslintConfig": {
     "extends": [
       "react-app",
