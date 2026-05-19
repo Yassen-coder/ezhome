@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import { getAffiliateClickUrl } from "../lib/api";
+import { useCurrency } from "../lib/currencyContext";
 
 const SOURCE_LABEL = {
   amazon: "Amazon",
@@ -7,11 +8,24 @@ const SOURCE_LABEL = {
   shein: "SHEIN",
 };
 
+const CATEGORY_LABELS = {
+  "smart-home": "Smart Home",
+  "kitchen": "Kitchen",
+  "decor": "Decor",
+  "organization": "Organization",
+  "tiktok": "TikTok Finds",
+  "fashion": "Fashion",
+};
+
 const CTA_LABELS = ["Shop Now", "View Deal", "Get Yours"];
 
 const ProductCard = ({ product, ctaIndex = 0 }) => {
-  const discount = Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100);
+  const { formatPrice } = useCurrency();
+  const discount = Math.round(
+    ((product.original_price - product.discounted_price) / product.original_price) * 100
+  );
   const cta = CTA_LABELS[ctaIndex % CTA_LABELS.length];
+  const categoryLabel = CATEGORY_LABELS[product.category] || product.category.replaceAll("-", " ");
 
   return (
     <article
@@ -33,6 +47,7 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
+
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
           {product.badges?.slice(0, 2).map((b) => (
@@ -49,6 +64,7 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
             </span>
           )}
         </div>
+
         {/* Source pill */}
         <span className="absolute top-3 right-3 px-2.5 py-1 bg-background/90 backdrop-blur text-foreground text-[10px] tracking-[0.15em] font-semibold border border-border">
           {SOURCE_LABEL[product.source] || product.source}
@@ -57,11 +73,13 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
 
       {/* Body */}
       <div className="flex flex-col gap-2 p-4 sm:p-5">
-        <p className="overline text-muted-foreground text-[10px]">{product.category.replace("-", " ")}</p>
+        <p className="overline text-muted-foreground text-[10px]">{categoryLabel}</p>
         <h3 className="font-display font-medium text-base sm:text-lg leading-snug line-clamp-2">
           {product.title}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{product.short_description}</p>
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+          {product.short_description}
+        </p>
 
         {/* Rating */}
         <div className="flex items-center gap-1.5 mt-1">
@@ -69,7 +87,11 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
             {[1, 2, 3, 4, 5].map((i) => (
               <Star
                 key={i}
-                className={`w-3.5 h-3.5 ${i <= Math.round(product.rating) ? "fill-foreground text-foreground" : "text-muted-foreground"}`}
+                className={`w-3.5 h-3.5 ${
+                  i <= Math.round(product.rating)
+                    ? "fill-foreground text-foreground"
+                    : "text-muted-foreground"
+                }`}
               />
             ))}
           </div>
@@ -78,15 +100,19 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           </span>
         </div>
 
-        {/* Price */}
-        <div className="flex items-baseline gap-2 mt-1">
-          <span className="font-display text-2xl font-black tracking-tight">${product.discounted_price.toFixed(2)}</span>
+        {/* Price — يستخدم formatPrice للتحويل التلقائي */}
+        <div className="flex flex-wrap items-baseline gap-2 mt-1">
+          <span className="font-display text-2xl font-black tracking-tight">
+            {formatPrice(product.discounted_price)}
+          </span>
           {product.original_price > product.discounted_price && (
-            <span className="text-sm text-muted-foreground line-through">${product.original_price.toFixed(2)}</span>
+            <span className="text-sm text-muted-foreground line-through">
+              {formatPrice(product.original_price)}
+            </span>
           )}
           {product.original_price > product.discounted_price && (
             <span className="ml-auto text-[10px] overline text-accent font-bold">
-              SAVE ${(product.original_price - product.discounted_price).toFixed(0)}
+              SAVE {formatPrice(product.original_price - product.discounted_price)}
             </span>
           )}
         </div>
@@ -98,6 +124,17 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           rel="noopener noreferrer sponsored"
           aria-label={`${cta} — ${product.title}`}
           className="group/btn mt-3 inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-foreground text-background text-sm font-semibold tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:-translate-y-[1px]"
+          data-testid={`product-cta-${product.id}`}
+        >
+          {cta}
+          <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
+        </a>
+      </div>
+    </article>
+  );
+};
+
+export default ProductCard;          className="group/btn mt-3 inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-foreground text-background text-sm font-semibold tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:-translate-y-[1px]"
           data-testid={`product-cta-${product.id}`}
         >
           {cta}
