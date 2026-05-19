@@ -134,15 +134,4 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
   );
 };
 
-export default ProductCard;          className="group/btn mt-3 inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-foreground text-background text-sm font-semibold tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:-translate-y-[1px]"
-          data-testid={`product-cta-${product.id}`}
-        >
-          {cta}
-          <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
-        </a>
-      </div>
-    </article>
-  );
-};
-
 export default ProductCard;
