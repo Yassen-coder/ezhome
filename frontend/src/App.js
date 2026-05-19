@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./lib/theme";
 import { AuthProvider } from "./lib/auth";
 import { SettingsProvider } from "./lib/settings";
+import { CurrencyProvider } from "./lib/currencyContext";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -57,13 +58,13 @@ const AppRoutes = () => {
   return (
     <PublicShell>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/category/:slug" element={<Category />} />
-        <Route path="/deals" element={<Deals />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/"                    element={<Home />} />
+        <Route path="/products"            element={<Products />} />
+        <Route path="/category/:slug"      element={<Category />} />
+        <Route path="/deals"               element={<Deals />} />
+        <Route path="/about"               element={<About />} />
+        <Route path="/contact"             element={<Contact />} />
+        <Route path="/privacy"             element={<Privacy />} />
         <Route path="/affiliate-disclosure" element={<AffiliateDisclosure />} />
       </Routes>
     </PublicShell>
@@ -75,12 +76,14 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <SettingsProvider>
-          <BrowserRouter>
-            <div className="App min-h-screen flex flex-col bg-background text-foreground">
-              <AppRoutes />
-              <Toaster position="bottom-right" richColors />
-            </div>
-          </BrowserRouter>
+          <CurrencyProvider>
+            <BrowserRouter>
+              <div className="App min-h-screen flex flex-col bg-background text-foreground">
+                <AppRoutes />
+                <Toaster position="bottom-right" richColors />
+              </div>
+            </BrowserRouter>
+          </CurrencyProvider>
         </SettingsProvider>
       </AuthProvider>
     </ThemeProvider>
