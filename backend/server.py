@@ -14,6 +14,7 @@ import uuid
 import bcrypt
 import jwt
 from datetime import datetime, timezone, timedelta
+import resend
 
 
 ROOT_DIR = Path(__file__).parent
@@ -377,6 +378,29 @@ async def contact(payload: ContactCreate):
     doc = msg.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.contacts.insert_one(doc)
+
+    # Send email notification
+    try:
+        resend_api_key = os.environ.get("RESEND_API_KEY")
+        contact_email = os.environ.get("CONTACT_EMAIL", "dxnyementaiz@gmail.com")
+        if resend_api_key:
+            resend.api_key = resend_api_key
+            resend.Emails.send({
+                "from": "EzHome Contact <onboarding@resend.dev>",
+                "to": contact_email,
+                "subject": f"New Contact Message from {payload.name}",
+                "html": f"""
+                <h2>New message from EzHome Contact Form</h2>
+                <p><strong>Name:</strong> {payload.name}</p>
+                <p><strong>Email:</strong> {payload.email}</p>
+                <p><strong>Subject:</strong> {payload.subject}</p>
+                <p><strong>Message:</strong></p>
+                <p>{payload.message}</p>
+                """
+            })
+    except Exception as e:
+        logging.error(f"Email send failed: {e}")
+
     return {"ok": True}
 
 
