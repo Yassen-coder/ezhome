@@ -1,103 +1,86 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Search, Moon, Sun, Menu, X, ShoppingBag } from "lucide-react";
-import { useTheme } from "../lib/theme";
-import { useSettings } from "../lib/settings";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { Input } from "./ui/input";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
+import { useCurrency, CURRENCIES } from "../lib/currencyContext";
 
-const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Shop", to: "/products" },
-  { label: "Smart Home", to: "/category/smart-home" },
-  { label: "Kitchen", to: "/category/kitchen" },
-  { label: "Decor", to: "/category/decor" },
-  { label: "TikTok Finds", to: "/category/tiktok" },
-  { label: "Fashion", to: "/category/fashion" },
-  { label: "Deals", to: "/deals" },
-];
+const CurrencySelector = ({ mobile = false }) => {
+  const { currency, setCurrency } = useCurrency();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
-const Navbar = () => {
-  const { theme, toggle } = useTheme();
-  const settings = useSettings();
-  const announcement_text = settings?.announcement_text || "FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY";
-  const [openSearch, setOpenSearch] = useState(false);
-  const [q, setQ] = useState("");
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
+  // إغلاق عند الضغط خارج القائمة
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
-  const submit = (e) => {
-    e.preventDefault();
-    if (q.trim()) {
-      navigate(`/products?search=${encodeURIComponent(q)}`);
-      setOpenSearch(false);
-      setMobileOpen(false);
-      setQ("");
-    }
-  };
-
-  return (
-    <>
-      {/* Announcement bar */}
-      <div className="bg-foreground text-background text-[10px] sm:text-sm py-2 text-center font-medium tracking-wider px-4" data-testid="announcement-bar">
-        {announcement_text}
+  // نسخة الجوال — داخل Sheet Drawer
+  if (mobile) {
+    return (
+      <div className="pt-2">
+        <p className="overline text-muted-foreground text-[10px] mb-3">Currency</p>
+        <div className="flex flex-wrap gap-2">
+          {CURRENCIES.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => setCurrency(c.code)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border transition-colors ${
+                currency.code === c.code
+                  ? "bg-foreground text-background border-foreground"
+                  : "border-border hover:border-foreground"
+              }`}
+            >
+              <span>{c.flag}</span>
+              <span className="font-medium">{c.code}</span>
+            </button>
+          ))}
+        </div>
       </div>
+    );
+  }
 
-      <header
-        className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border"
-        data-testid="navbar"
+  // نسخة سطح المكتب — dropdown
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border hover:border-foreground transition-colors"
+        aria-label="Select currency"
+        data-testid="currency-selector"
       >
-        <nav className="container-px mx-auto flex items-center justify-between h-16 sm:h-20 max-w-[1400px]">
-          {/* Mobile menu */}
-          <div className="lg:hidden">
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild>
-                <button data-testid="mobile-menu-button" className="p-2 -ml-2" aria-label="Menu">
-                  <Menu className="w-5 h-5" />
-                </button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] bg-background">
-                <div className="flex flex-col gap-1 pt-8">
-                  {NAV_LINKS.map((l) => (
-                    <Link
-                      key={l.to}
-                      to={l.to}
-                      onClick={() => setMobileOpen(false)}
-                      className="py-3 text-lg font-display font-medium hover:opacity-60 transition-opacity"
-                      data-testid={`mobile-nav-${l.to.replace(/\//g, "-")}`}
-                    >
-                      {l.label}
-                    </Link>
-                  ))}
-                  <div className="h-px bg-border my-4" />
-                  <Link to="/about" onClick={() => setMobileOpen(false)} className="py-2 text-sm overline opacity-70">About</Link>
-                  <Link to="/contact" onClick={() => setMobileOpen(false)} className="py-2 text-sm overline opacity-70">Contact</Link>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+        <span>{currency.flag}</span>
+        <span>{currency.code}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
 
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
-            <ShoppingBag className="w-5 h-5 hidden sm:block" strokeWidth={1.5} />
-            <span className="font-display font-black text-2xl sm:text-3xl tracking-tight">
-              EzHome<span className="text-accent">.</span>
-            </span>
-          </Link>
-
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-8">
-            {NAV_LINKS.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                className="text-sm font-medium hover:opacity-60 transition-opacity"
-                data-testid={`nav-${l.to.replace(/\//g, "-")}`}
-              >
-                {l.label}
-              </Link>
-            ))}
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-52 bg-background border border-border shadow-lg z-[60]">
+          {CURRENCIES.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => { setCurrency(c.code); setOpen(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-secondary transition-colors ${
+                currency.code === c.code ? "bg-secondary font-semibold" : ""
+              }`}
+              data-testid={`currency-option-${c.code}`}
+            >
+              <span className="text-base">{c.flag}</span>
+              <span className="font-medium">{c.code}</span>
+              <span className="text-muted-foreground text-xs ml-auto">{c.symbol}</span>
+            </button>
+          ))}
+          <div className="border-t border-border px-4 py-2">
+            <p className="text-[10px] text-muted-foreground">Rates updated daily</p>
           </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CurrencySelector;          </div>
 
           {/* Right actions */}
           <div className="flex items-center gap-1 sm:gap-2">
