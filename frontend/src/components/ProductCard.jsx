@@ -1,5 +1,4 @@
 import { Star } from "lucide-react";
-import { Link } from "react-router-dom";
 import { getAffiliateClickUrl } from "../lib/api";
 import { useCurrency } from "../lib/currencyContext";
 
@@ -9,21 +8,36 @@ const SOURCE_LABEL = {
   shein: "SHEIN",
 };
 
+const CATEGORY_LABELS = {
+  "smart-home": "Smart Home",
+  "kitchen": "Kitchen",
+  "decor": "Decor",
+  "organization": "Organization",
+  "tiktok": "TikTok Finds",
+  "fashion": "Fashion",
+};
+
+const CTA_LABELS = ["Shop Now", "View Deal", "Get Yours"];
+
 const ProductCard = ({ product, ctaIndex = 0 }) => {
   const { formatPrice } = useCurrency();
-  const discount = product.original_price > product.discounted_price
-    ? Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100)
-    : 0;
+  const discount = Math.round(
+    ((product.original_price - product.discounted_price) / product.original_price) * 100
+  );
+  const cta = CTA_LABELS[ctaIndex % CTA_LABELS.length];
+  const categoryLabel = CATEGORY_LABELS[product.category] || product.category.replaceAll("-", " ");
 
   return (
     <article
-      className="group flex flex-col bg-card overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
+      className="group relative flex flex-col bg-card border border-border hover-lift overflow-hidden"
       data-testid={`product-card-${product.id}`}
     >
-      {/* ── صورة المنتج ── */}
-      <Link
-        to={`/product/${product.id}`}
-        className="relative block aspect-square overflow-hidden bg-muted"
+      {/* Image */}
+      <a
+        href={getAffiliateClickUrl(product.id)}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+        className="relative block aspect-[4/5] overflow-hidden bg-muted"
         data-testid={`product-image-link-${product.id}`}
       >
         <img
@@ -31,76 +45,70 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           alt={product.title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
 
-        {/* خصم فقط — بسيط وصغير */}
-        {discount > 0 && (
-          <span className="absolute top-2.5 left-2.5 px-2 py-0.5 bg-destructive text-destructive-foreground text-[11px] font-bold rounded-full">
-            -{discount}%
-          </span>
-        )}
-
-        {/* المتجر */}
-        <span className="absolute top-2.5 right-2.5 px-2 py-0.5 bg-background/85 backdrop-blur-sm text-foreground text-[11px] font-semibold rounded-full border border-border/50">
-          {SOURCE_LABEL[product.source] || product.source}
-        </span>
-      </Link>
-
-      {/* ── معلومات المنتج ── */}
-      <div className="flex flex-col gap-1.5 p-3">
-        {/* الاسم */}
-        <Link to={`/product/${product.id}`}>
-          <h3 className="text-sm font-semibold leading-snug line-clamp-2 hover:opacity-70 transition-opacity">
-            {product.title}
-          </h3>
-        </Link>
-
-        {/* تقييم بسيط - تمت إضافة الحماية هنا 🛡️ */}
-        {product.rating ? (
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-            <span className="text-xs text-muted-foreground">
-              {product.rating.toFixed(1)}
-              {product.review_count !== undefined && product.review_count !== null && (
-                <span className="ml-1 opacity-60">({product.review_count.toLocaleString()})</span>
-              )}
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
+          {product.badges?.slice(0, 2).map((b) => (
+            <span
+              key={b}
+              className="px-2.5 py-1 bg-foreground text-background text-[10px] tracking-[0.15em] font-semibold"
+            >
+              {b}
             </span>
-          </div>
-        ) : (
-          /* مساحة فارغة بديلة للحفاظ على استقامة التصميم إذا لم يكن هناك تقييم */
-          <div className="h-4"></div> 
-        )}
-
-        {/* السعر */}
-        <div className="flex items-baseline gap-1.5 mt-0.5">
-          <span className="text-base font-bold tracking-tight">
-            {formatPrice(product.discounted_price)}
-          </span>
-          {product.original_price > product.discounted_price && (
-            <span className="text-xs text-muted-foreground line-through">
-              {formatPrice(product.original_price)}
+          ))}
+          {discount > 0 && !product.badges?.some((b) => b.includes("%")) && (
+            <span className="px-2.5 py-1 bg-destructive text-destructive-foreground text-[10px] tracking-[0.15em] font-semibold">
+              {discount}% OFF
             </span>
           )}
         </div>
 
-        {/* زر الشراء */}
-        <a
-          href={getAffiliateClickUrl(product.id)}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-          className="mt-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-foreground text-background text-xs font-semibold rounded-lg transition-all duration-200 hover:opacity-80 hover:-translate-y-[1px] active:scale-[0.98]"
-          data-testid={`product-cta-${product.id}`}
-        >
-          Shop Now
-          <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-        </a>
-      </div>
-    </article>
-  );
-};
+        {/* Source pill */}
+        <span className="absolute top-3 right-3 px-2.5 py-1 bg-background/90 backdrop-blur text-foreground text-[10px] tracking-[0.15em] font-semibold border border-border">
+          {SOURCE_LABEL[product.source] || product.source}
+        </span>
+      </a>
 
-export default ProductCard;
+      {/* Body */}
+      <div className="flex flex-col gap-2 p-4 sm:p-5">
+        <p className="overline text-muted-foreground text-[10px]">{categoryLabel}</p>
+        <h3 className="font-display font-medium text-base sm:text-lg leading-snug line-clamp-2">
+          {product.title}
+        </h3>
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+          {product.short_description}
+        </p>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1.5 mt-1">
+          <div className="flex">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Star
+                key={i}
+                className={`w-3.5 h-3.5 ${
+                  i <= Math.round(product.rating)
+                    ? "fill-foreground text-foreground"
+                    : "text-muted-foreground"
+                }`}
+              />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {product.rating.toFixed(1)} ({product.review_count.toLocaleString()})
+          </span>
+        </div>
+
+        {/* Price — يستخدم formatPrice للتحويل التلقائي */}
+        <div className="flex flex-wrap items-baseline gap-2 mt-1">
+          <span className="font-display text-2xl font-black tracking-tight">
+            {formatPrice(product.discounted_price)}
+          </span>
+          {product.original_price > product.discounted_price && (
+            <span className="text-sm text-muted-foreground line-through">
+              {formatPrice(product.original_price)}
+            </span>
           )}
           {product.original_price > product.discounted_price && (
             <span className="ml-auto text-[10px] overline text-accent font-bold">
