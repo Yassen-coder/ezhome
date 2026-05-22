@@ -93,15 +93,7 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
   );
 };
 
-export default ProductCard;          )}
-          {product.original_price > product.discounted_price && (
-            <span className="ml-auto text-[10px] overline text-accent font-bold">
-              SAVE {formatPrice(product.original_price - product.discounted_price)}
-            </span>
-          )}
-        </div>
-
-        {/* CTA */}
+export default ProductCard;        {/* CTA */}
         <a
           href={getAffiliateClickUrl(product.id)}
           target="_blank"
