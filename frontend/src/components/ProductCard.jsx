@@ -56,14 +56,21 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
           </h3>
         </Link>
 
-        {/* تقييم بسيط */}
-        <div className="flex items-center gap-1">
-          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-          <span className="text-xs text-muted-foreground">
-            {product.rating.toFixed(1)}
-            <span className="ml-1 opacity-60">({product.review_count.toLocaleString()})</span>
-          </span>
-        </div>
+        {/* تقييم بسيط - تمت إضافة الحماية هنا 🛡️ */}
+        {product.rating ? (
+          <div className="flex items-center gap-1">
+            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span className="text-xs text-muted-foreground">
+              {product.rating.toFixed(1)}
+              {product.review_count !== undefined && product.review_count !== null && (
+                <span className="ml-1 opacity-60">({product.review_count.toLocaleString()})</span>
+              )}
+            </span>
+          </div>
+        ) : (
+          /* مساحة فارغة بديلة للحفاظ على استقامة التصميم إذا لم يكن هناك تقييم */
+          <div className="h-4"></div> 
+        )}
 
         {/* السعر */}
         <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -93,14 +100,7 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
   );
 };
 
-export default ProductCard;        <div className="flex flex-wrap items-baseline gap-2 mt-1">
-          <span className="font-display text-2xl font-black tracking-tight">
-            {formatPrice(product.discounted_price)}
-          </span>
-          {product.original_price > product.discounted_price && (
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPrice(product.original_price)}
-            </span>
+export default ProductCard;
           )}
           {product.original_price > product.discounted_price && (
             <span className="ml-auto text-[10px] overline text-accent font-bold">
