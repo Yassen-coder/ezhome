@@ -93,15 +93,7 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
   );
 };
 
-export default ProductCard;        <div className="flex flex-wrap items-baseline gap-2 mt-1">
-          <span className="font-display text-2xl font-black tracking-tight">
-            {formatPrice(product.discounted_price)}
-          </span>
-          {product.original_price > product.discounted_price && (
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPrice(product.original_price)}
-            </span>
-          )}
+export default ProductCard;          )}
           {product.original_price > product.discounted_price && (
             <span className="ml-auto text-[10px] overline text-accent font-bold">
               SAVE {formatPrice(product.original_price - product.discounted_price)}
