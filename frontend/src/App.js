@@ -23,6 +23,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminBanners from "./pages/admin/Banners";
 import AdminSettings from "./pages/admin/Settings";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Public layout wraps public routes only — admin pages have their own chrome
 const PublicShell = ({ children }) => (
@@ -79,7 +80,9 @@ function App() {
           <CurrencyProvider>
             <BrowserRouter>
               <div className="App min-h-screen flex flex-col bg-background text-foreground">
-                <AppRoutes />
+                <ErrorBoundary>
+                  <AppRoutes />
+                </ErrorBoundary>
                 <Toaster position="bottom-right" richColors />
               </div>
             </BrowserRouter>

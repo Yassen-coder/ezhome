@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { api, formatApiError } from "../../lib/api";
 import { toast } from "sonner";
+import { useSettings } from "../../lib/settings";
+
 import { Save } from "lucide-react";
 
 const Settings = () => {
+  const { refetchSettings } = useSettings();
   const [settings, setSettings] = useState(null);
   const [form, setForm] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -31,6 +34,7 @@ const Settings = () => {
       const { data } = await api.patch("/settings", patch);
       setSettings(data);
       setForm(data);
+      await refetchSettings();
       toast.success("Settings saved");
     } catch (err) {
       toast.error(formatApiError(err.response?.data?.detail));

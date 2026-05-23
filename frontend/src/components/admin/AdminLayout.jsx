@@ -46,29 +46,36 @@ const AdminLayout = () => {
             </NavLink>
           ))}
         </nav>
-        <div className="hidden lg:block p-4 border-t border-border">
+        <div className="p-4 border-t border-border">
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-xs overline text-muted-foreground hover:text-foreground mb-4"
+            className="flex items-center gap-2 text-xs overline text-muted-foreground hover:text-foreground mb-3 lg:mb-4"
             data-testid="admin-view-site"
           >
             <ExternalLink className="w-3.5 h-3.5" /> View live site
           </a>
           {user && (
-            <div className="mb-3">
+            <div className="mb-3 hidden lg:block">
               <p className="text-xs text-muted-foreground">Signed in as</p>
               <p className="text-sm font-medium truncate" data-testid="admin-user-email">{user.email}</p>
             </div>
           )}
-          <button
-            onClick={handleLogout}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-border text-xs uppercase tracking-[0.18em] hover:border-foreground transition-colors"
-            data-testid="admin-logout-button"
-          >
-            <LogOut className="w-3.5 h-3.5" /> Sign out
-          </button>
+          <div className="flex gap-2 lg:flex-col">
+            {user && (
+              <p className="lg:hidden text-xs text-muted-foreground truncate flex-1 self-center" data-testid="admin-user-email-mobile">
+                {user.email}
+              </p>
+            )}
+            <button
+              onClick={handleLogout}
+              className="flex-1 lg:w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-border text-xs uppercase tracking-[0.18em] hover:border-foreground transition-colors"
+              data-testid="admin-logout-button"
+            >
+              <LogOut className="w-3.5 h-3.5" /> Sign out
+            </button>
+          </div>
         </div>
       </aside>
 

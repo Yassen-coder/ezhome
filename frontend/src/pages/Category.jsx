@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import ProductGrid from "../components/ProductGrid";
+import { PageLoading, PageError, PageEmpty } from "../components/PageState";
 
 const CATEGORY_META = {
   "smart-home": { title: "Smart Home", overline: "Effortless luxury, automated", desc: "The tech that disappears into your life. Voice-controlled, app-connected, beautifully designed." },
@@ -15,11 +16,23 @@ const CATEGORY_META = {
 const Category = () => {
   const { slug } = useParams();
   const [products, setProducts] = useState([]);
+  const [status, setStatus] = useState("loading");
   const meta = CATEGORY_META[slug] || { title: slug, overline: "Shop", desc: "" };
 
-  useEffect(() => {
-    api.get("/products", { params: { category: slug, limit: 100 } }).then((r) => setProducts(r.data));
+  const load = useCallback(async () => {
+    setStatus("loading");
+    try {
+      const { data } = await api.get("/products", { params: { category: slug, limit: 100 } });
+      setProducts(data);
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
   }, [slug]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
     <div data-testid={`category-page-${slug}`}>
@@ -30,8 +43,19 @@ const Category = () => {
         </h1>
         <p className="mt-5 text-muted-foreground max-w-xl">{meta.desc}</p>
       </section>
-      <ProductGrid products={products} />
-      {products.length === 0 && <p className="text-center text-muted-foreground py-20">Loading...</p>}
+
+      {status === "loading" && <PageLoading message="Loading products…" />}
+      {status === "error" && (
+        <PageError message="Unable to load this category. Please try again." onRetry={load} />
+      )}
+      {status === "success" && (
+        <>
+          <ProductGrid products={products} />
+          {products.length === 0 && (
+            <PageEmpty message="No products in this category yet." testId={`category-empty-${slug}`} />
+          )}
+        </>
+      )}
     </div>
   );
 };
