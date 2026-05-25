@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Instagram, Music2, Youtube, Twitter, Mail } from "lucide-react";
 
 const Footer = () => {
@@ -21,27 +22,27 @@ const Footer = () => {
         <div>
           <p className="overline mb-4">Shop</p>
           <ul className="space-y-2 text-sm">
-            <li><a href="/category/smart-home" className="hover:opacity-60">Smart Home</a></li>
-            <li><a href="/category/kitchen" className="hover:opacity-60">Kitchen</a></li>
-            <li><a href="/category/decor" className="hover:opacity-60">Home Decor</a></li>
-            <li><a href="/category/organization" className="hover:opacity-60">Organization</a></li>
-            <li><a href="/category/tiktok" className="hover:opacity-60">TikTok Finds</a></li>
-            <li><a href="/category/fashion" className="hover:opacity-60">Fashion</a></li>
+            <li><Link to="/category/smart-home" className="hover:opacity-60">Smart Home</Link></li>
+            <li><Link to="/category/kitchen" className="hover:opacity-60">Kitchen</Link></li>
+            <li><Link to="/category/decor" className="hover:opacity-60">Home Decor</Link></li>
+            <li><Link to="/category/organization" className="hover:opacity-60">Organization</Link></li>
+            <li><Link to="/category/tiktok" className="hover:opacity-60">TikTok Finds</Link></li>
+            <li><Link to="/category/fashion" className="hover:opacity-60">Fashion</Link></li>
           </ul>
         </div>
         <div>
           <p className="overline mb-4">Brand</p>
           <ul className="space-y-2 text-sm">
-            <li><a href="/about" className="hover:opacity-60">About Us</a></li>
-            <li><a href="/contact" className="hover:opacity-60">Contact</a></li>
-            <li><a href="/deals" className="hover:opacity-60">Daily Deals</a></li>
+            <li><Link to="/about" className="hover:opacity-60">About Us</Link></li>
+            <li><Link to="/contact" className="hover:opacity-60">Contact</Link></li>
+            <li><Link to="/deals" className="hover:opacity-60">Daily Deals</Link></li>
           </ul>
         </div>
         <div>
           <p className="overline mb-4">Legal</p>
           <ul className="space-y-2 text-sm">
-            <li><a href="/privacy" className="hover:opacity-60">Privacy Policy</a></li>
-            <li><a href="/affiliate-disclosure" className="hover:opacity-60">Affiliate Disclosure</a></li>
+            <li><Link to="/privacy" className="hover:opacity-60">Privacy Policy</Link></li>
+            <li><Link to="/affiliate-disclosure" className="hover:opacity-60">Affiliate Disclosure</Link></li>
           </ul>
         </div>
       </div>

@@ -21,9 +21,12 @@ const CTA_LABELS = ["Shop Now", "View Deal", "Get Yours"];
 
 const ProductCard = ({ product, ctaIndex = 0 }) => {
   const { formatPrice } = useCurrency();
-  const discount = Math.round(
-    ((product.original_price - product.discounted_price) / product.original_price) * 100
-  );
+  const discount =
+    product.original_price > 0
+      ? Math.round(
+          ((product.original_price - product.discounted_price) / product.original_price) * 100
+        )
+      : 0;
   const cta = CTA_LABELS[ctaIndex % CTA_LABELS.length];
   const categoryLabel = CATEGORY_LABELS[product.category] || product.category.replaceAll("-", " ");
 

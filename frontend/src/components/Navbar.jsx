@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { label: "Smart Home", to: "/category/smart-home" },
   { label: "Kitchen", to: "/category/kitchen" },
   { label: "Decor", to: "/category/decor" },
+  { label: "Organization", to: "/category/organization" },
   { label: "TikTok Finds", to: "/category/tiktok" },
   { label: "Fashion", to: "/category/fashion" },
   { label: "Deals", to: "/deals" },

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
 
 const ProductGrid = ({ products, title, overline, subtitle, viewAllLink, columns = 4 }) => {
@@ -21,9 +22,9 @@ const ProductGrid = ({ products, title, overline, subtitle, viewAllLink, columns
             {subtitle && <p className="mt-3 text-muted-foreground max-w-xl">{subtitle}</p>}
           </div>
           {viewAllLink && (
-            <a href={viewAllLink} className="text-sm font-medium underline-offset-4 hover:underline">
+            <Link to={viewAllLink} className="text-sm font-medium underline-offset-4 hover:underline">
               View all →
-            </a>
+            </Link>
           )}
         </div>
       )}

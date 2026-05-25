@@ -1,7 +1,20 @@
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-export const API = `${BACKEND_URL}/api`;
+
+if (!BACKEND_URL) {
+  if (process.env.NODE_ENV === "production") {
+    console.error(
+      "[EzHome] REACT_APP_BACKEND_URL is not set. API requests will fail until it is configured in Netlify."
+    );
+  } else {
+    console.warn(
+      "[EzHome] REACT_APP_BACKEND_URL is missing. Set it in frontend/.env for local development."
+    );
+  }
+}
+
+export const API = BACKEND_URL ? `${BACKEND_URL}/api` : "/api";
 
 export const api = axios.create({ baseURL: API });
 
