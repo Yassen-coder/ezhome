@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Star, ExternalLink } from "lucide-react";
 import { api, getAffiliateClickUrl } from "../lib/api";
 import { useCurrency } from "../lib/currencyContext";
-import { getCategoryBySlug } from "../lib/categories";
+import { getCategoryBySlug, categoryPath } from "../lib/categories";
 import { getProductImages } from "../lib/productImages";
 import ProductImageSlider from "../components/ProductImageSlider";
+import ProductVideo from "../components/ProductVideo";
+import ProductCard from "../components/ProductCard";
 import { PageError } from "../components/PageState";
 
 const SOURCE_LABEL = {
@@ -18,17 +20,27 @@ const ProductPage = () => {
   const { id } = useParams();
   const { formatPrice } = useCurrency();
   const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
   const [status, setStatus] = useState("loading");
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const load = useCallback(async () => {
     setStatus("loading");
     try {
-      const { data } = await api.get(`/products/${id}`);
-      setProduct(data);
+      const [productRes, relatedRes] = await Promise.all([
+        api.get(`/products/${id}`),
+        api.get(`/products/${id}/related`, { params: { limit: 8 } }),
+      ]);
+      setProduct(productRes.data);
+      setRelated(relatedRes.data || []);
       setStatus("success");
-      document.title = `${data.title} | EzHome`;
+      document.title = `${productRes.data.title} | EzHome`;
     } catch {
       setProduct(null);
+      setRelated([]);
       setStatus("error");
       document.title = "Product | EzHome";
     }
@@ -52,12 +64,7 @@ const ProductPage = () => {
   }
 
   if (status === "error" || !product) {
-    return (
-      <PageError
-        message="This product could not be found."
-        onRetry={load}
-      />
-    );
+    return <PageError message="This product could not be found." onRetry={load} />;
   }
 
   const images = getProductImages(product);
@@ -75,23 +82,26 @@ const ProductPage = () => {
     <div className="pb-28 sm:pb-12" data-testid={`product-page-${product.id}`}>
       <div className="container-px mx-auto max-w-lg sm:max-w-2xl lg:max-w-4xl pt-4 sm:pt-8">
         <Link
-          to={category ? `/category/${product.category}` : "/products"}
+          to={category ? categoryPath(product.category) : "/products"}
           className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground mb-4"
           data-testid="product-back-link"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to shop
+          <ArrowLeft className="w-4 h-4" /> Back to {category?.name || "shop"}
         </Link>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-10 lg:items-start">
-          <ProductImageSlider
-            images={images}
-            alt={product.title}
-            rounded="rounded-2xl"
-            autoPlay
-            intervalMs={4500}
-            enableMotion
-            className="w-full"
-          />
+          <div>
+            <ProductImageSlider
+              images={images}
+              alt={product.title}
+              rounded="rounded-2xl"
+              autoPlay
+              intervalMs={4500}
+              enableMotion
+              className="w-full"
+            />
+            {product.video_url && <ProductVideo url={product.video_url} title={product.title} />}
+          </div>
 
           <div className="mt-5 lg:mt-0">
             {category && (
@@ -160,9 +170,7 @@ const ProductPage = () => {
               {product.short_description}
             </p>
 
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              {product.description}
-            </p>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{product.description}</p>
 
             <a
               href={shopUrl}
@@ -181,10 +189,23 @@ const ProductPage = () => {
             </p>
           </div>
         </div>
+
+        {related.length > 0 && (
+          <section className="mt-12 sm:mt-16 border-t border-border pt-10" data-testid="product-related">
+            <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-1">
+              More in {category?.name || "this category"}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-5">Popular picks shoppers love</p>
+            <div className="grid grid-cols-2 gap-x-1.5 gap-y-3 sm:gap-x-2 sm:gap-y-4 md:grid-cols-3 lg:grid-cols-4">
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
-      {/* Sticky mobile CTA — SHEIN-style */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-border bg-background/95 backdrop-blur-md p-3 safe-area-pb">
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-border bg-background/95 backdrop-blur-md p-3">
         <a
           href={shopUrl}
           target="_blank"

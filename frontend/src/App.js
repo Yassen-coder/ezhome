@@ -25,6 +25,7 @@ import AdminProducts from "./pages/admin/Products";
 import AdminBanners from "./pages/admin/Banners";
 import AdminSettings from "./pages/admin/Settings";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Public layout wraps public routes only — admin pages have their own chrome
 const PublicShell = ({ children }) => (
@@ -81,6 +82,7 @@ function App() {
         <SettingsProvider>
           <CurrencyProvider>
             <BrowserRouter>
+              <ScrollToTop />
               <div className="App min-h-screen flex flex-col bg-background text-foreground">
                 <ErrorBoundary>
                   <AppRoutes />

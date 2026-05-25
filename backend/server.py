@@ -93,7 +93,9 @@ class Product(BaseModel):
     description: str
     short_description: str = ""
     image_url: str
+    image_urls: List[str] = Field(default_factory=list)
     secondary_image_url: Optional[str] = None
+    video_url: Optional[str] = None
     category: str
     source: str
     affiliate_url: str
@@ -114,7 +116,9 @@ class ProductCreate(BaseModel):
     description: str
     short_description: str = ""
     image_url: str
+    image_urls: List[str] = Field(default_factory=list)
     secondary_image_url: Optional[str] = None
+    video_url: Optional[str] = None
     category: str
     source: str
     affiliate_url: str
@@ -133,7 +137,9 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     short_description: Optional[str] = None
     image_url: Optional[str] = None
+    image_urls: Optional[List[str]] = None
     secondary_image_url: Optional[str] = None
+    video_url: Optional[str] = None
     category: Optional[str] = None
     source: Optional[str] = None
     affiliate_url: Optional[str] = None
@@ -268,6 +274,27 @@ async def send_email_via_resend(to: str, subject: str, html: str) -> bool:
         return False
 
 
+def normalize_product_dict(doc: dict) -> dict:
+    """Unify image_url, image_urls, and secondary_image_url."""
+    if not doc:
+        return doc
+    urls = [str(u).strip() for u in (doc.get("image_urls") or []) if u and str(u).strip()]
+    primary = (doc.get("image_url") or "").strip()
+    secondary = (doc.get("secondary_image_url") or "").strip()
+    if primary and primary not in urls:
+        urls.insert(0, primary)
+    if secondary and secondary not in urls:
+        urls.append(secondary)
+    if not urls and primary:
+        urls = [primary]
+    doc["image_urls"] = urls
+    doc["image_url"] = urls[0] if urls else primary
+    doc["secondary_image_url"] = urls[1] if len(urls) > 1 else None
+    video = doc.get("video_url")
+    doc["video_url"] = str(video).strip() if video and str(video).strip() else None
+    return doc
+
+
 # ============== ROUTES ==============
 @api_router.get("/")
 async def root():
@@ -299,7 +326,17 @@ async def list_products(
     if search:
         q['title'] = {"$regex": search, "$options": "i"}
     docs = await db.products.find(q, {"_id": 0}).sort("created_at", -1).to_list(limit)
-    return docs
+    return [normalize_product_dict(d) for d in docs]
+
+
+@api_router.get("/products/{product_id}/related", response_model=List[Product])
+async def related_products(product_id: str, limit: int = Query(8, le=16)):
+    doc = await db.products.find_one({"id": product_id}, {"_id": 0, "category": 1})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Product not found")
+    q = {"category": doc["category"], "id": {"$ne": product_id}}
+    docs = await db.products.find(q, {"_id": 0}).sort("click_count", -1).to_list(limit)
+    return [normalize_product_dict(d) for d in docs]
 
 
 @api_router.get("/products/{product_id}", response_model=Product)
@@ -307,16 +344,17 @@ async def get_product(product_id: str):
     doc = await db.products.find_one({"id": product_id}, {"_id": 0})
     if not doc:
         raise HTTPException(status_code=404, detail="Product not found")
-    return doc
+    return normalize_product_dict(doc)
 
 
 @api_router.post("/products", response_model=Product)
 async def create_product(payload: ProductCreate, _: dict = Depends(get_current_admin)):
-    product = Product(**payload.model_dump())
+    data = normalize_product_dict(payload.model_dump())
+    product = Product(**data)
     doc = product.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.products.insert_one(doc)
-    return product
+    return normalize_product_dict(doc)
 
 
 @api_router.patch("/products/{product_id}", response_model=Product)
@@ -324,11 +362,12 @@ async def update_product(product_id: str, payload: ProductUpdate, _: dict = Depe
     updates = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
+    updates = normalize_product_dict(updates)
     res = await db.products.update_one({"id": product_id}, {"$set": updates})
     if res.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     doc = await db.products.find_one({"id": product_id}, {"_id": 0})
-    return doc
+    return normalize_product_dict(doc)
 
 
 @api_router.delete("/products/{product_id}")
@@ -688,6 +727,22 @@ async def startup_event():
             )
             if res.modified_count:
                 logger.info(f"Migrated {res.modified_count} products from {old_cat} to {new_cat}")
+
+        # Backfill image_urls for legacy products (once per doc missing the field)
+        legacy = db.products.find(
+            {"$or": [{"image_urls": {"$exists": False}}, {"image_urls": None}, {"image_urls": []}]},
+            {"_id": 0},
+        )
+        async for p in legacy:
+            norm = normalize_product_dict(dict(p))
+            await db.products.update_one(
+                {"id": p["id"]},
+                {"$set": {
+                    "image_urls": norm["image_urls"],
+                    "image_url": norm["image_url"],
+                    "secondary_image_url": norm.get("secondary_image_url"),
+                }},
+            )
 
         count = await db.products.count_documents({})
         if count == 0:
