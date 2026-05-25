@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { useCurrency } from "../lib/currencyContext";
 import { getProductImages, productLandingPath } from "../lib/productImages";
-import ProductImageSlider from "./ProductImageSlider";
+import ProductCardImage from "./ProductCardImage";
+import AnimatedPromoBadge from "./AnimatedPromoBadge";
 
 const SOURCE_LABEL = {
   amazon: "Amazon",
@@ -18,36 +19,29 @@ const formatSold = (n) => {
 const ProductCard = ({ product }) => {
   const { formatPrice } = useCurrency();
   const images = getProductImages(product);
+  const mainImage = images[0];
   const discount =
     product.original_price > 0
       ? Math.round(
           ((product.original_price - product.discounted_price) / product.original_price) * 100
         )
       : 0;
+
   return (
-    <article
-      className="group flex flex-col min-w-0"
-      data-testid={`product-card-${product.id}`}
-    >
+    <article className="group flex flex-col min-w-0" data-testid={`product-card-${product.id}`}>
       <Link
         to={productLandingPath(product.id)}
         className="block min-w-0"
         data-testid={`product-card-link-${product.id}`}
       >
         <div className="relative">
-          <ProductImageSlider
-            images={images}
-            alt={product.title}
-            rounded="rounded-xl sm:rounded-2xl"
-            autoPlay
-            enableMotion
-          />
+          <ProductCardImage src={mainImage} alt={product.title} />
 
-          {discount > 0 && (
-            <span className="absolute top-2 left-2 z-10 rounded-md bg-[#FA6338] px-1.5 py-0.5 text-[10px] font-semibold text-white leading-none">
-              -{discount}%
-            </span>
-          )}
+          <AnimatedPromoBadge
+            discount={discount}
+            originalPrice={product.original_price}
+            discountedPrice={product.discounted_price}
+          />
 
           <span className="absolute top-2 right-2 z-10 rounded-md bg-white/95 dark:bg-black/80 px-1.5 py-0.5 text-[9px] font-medium text-neutral-800 dark:text-neutral-100 shadow-sm">
             {SOURCE_LABEL[product.source] || product.source}
@@ -56,7 +50,7 @@ const ProductCard = ({ product }) => {
 
         <div className="mt-2 px-0.5 space-y-1">
           <h3
-            className="text-[12px] sm:text-[13px] leading-snug text-neutral-800 dark:text-neutral-100 line-clamp-2 font-normal tracking-normal"
+            className="text-[12px] sm:text-[13px] leading-snug text-neutral-800 dark:text-neutral-100 line-clamp-2 font-normal"
             style={{ fontFamily: "Satoshi, system-ui, sans-serif" }}
           >
             {product.title}
@@ -92,7 +86,7 @@ const ProductCard = ({ product }) => {
           </div>
 
           {product.badges?.[0] && (
-            <p className="text-[10px] text-[#FA6338] font-medium truncate">
+            <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium truncate">
               {product.badges[0]}
             </p>
           )}

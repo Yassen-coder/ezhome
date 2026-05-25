@@ -253,6 +253,9 @@ const ProductForm = ({ initial, onSubmit, onCancel, submitLabel = "Save" }) => {
           className={inputCls}
         />
       </Field>
+      <p className="sm:col-span-2 text-[11px] text-muted-foreground -mb-2">
+        Timed offers are managed under Admin → Flash Deals (multiple products, start/end, on/off).
+      </p>
       <div className="sm:col-span-2 flex flex-wrap gap-4 pt-2">
         <Toggle
           label="Featured / Best Seller"
@@ -267,7 +270,7 @@ const ProductForm = ({ initial, onSubmit, onCancel, submitLabel = "Save" }) => {
           testId="toggle-trending"
         />
         <Toggle
-          label="Daily Deal"
+          label="Legacy daily flag"
           value={form.is_daily_deal}
           onChange={(v) => update("is_daily_deal", v)}
           testId="toggle-daily-deal"

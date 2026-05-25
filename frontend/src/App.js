@@ -24,6 +24,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminBanners from "./pages/admin/Banners";
 import AdminSettings from "./pages/admin/Settings";
+import AdminFlashDeals from "./pages/admin/FlashDeals";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -52,6 +53,7 @@ const AppRoutes = () => {
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="banners" element={<AdminBanners />} />
+          <Route path="flash-deals" element={<AdminFlashDeals />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>

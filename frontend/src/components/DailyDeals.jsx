@@ -1,6 +1,7 @@
-import { useCountdown, getEndOfDay } from "../lib/useCountdown";
+import { useCountdown } from "../lib/useCountdown";
 import ProductCard from "./ProductCard";
 import { Flame } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Cell = ({ value, label }) => (
   <div className="flex flex-col items-center" data-testid={`countdown-${label.toLowerCase()}`}>
@@ -11,25 +12,46 @@ const Cell = ({ value, label }) => (
   </div>
 );
 
-const DailyDeals = ({ products = [] }) => {
-  const target = getEndOfDay();
-  const { hours, minutes, seconds } = useCountdown(target);
+const DailyDeals = ({
+  products = [],
+  campaign = null,
+}) => {
+  const endsAt = campaign?.ends_at ? new Date(campaign.ends_at).getTime() : null;
+  const { days, hours, minutes, seconds, done } = useCountdown(
+    endsAt || Date.now()
+  );
+
+  if (!products.length || done) return null;
+
+  const title = campaign?.title || "Daily Deals";
+  const subtitle = campaign?.subtitle || "Gone when the timer hits zero.";
 
   return (
     <section className="bg-secondary border-y border-border" data-testid="daily-deals-section">
       <div className="container-px mx-auto max-w-[1400px] py-16 sm:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-12 sm:mb-16">
           <div className="lg:col-span-6">
-            <p className="overline text-muted-foreground mb-3 flex items-center gap-2"><Flame className="w-3.5 h-3.5" /> Today Only</p>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-none">
-              Daily Deals.<br />
-              <span className="italic font-medium">Gone by midnight.</span>
-            </h2>
-            <p className="mt-4 text-muted-foreground max-w-md">
-              Premium pieces at unbeatable prices. Once the clock hits zero, these deals disappear.
+            <p className="overline text-muted-foreground mb-3 flex items-center gap-2">
+              <Flame className="w-3.5 h-3.5" /> Limited time
             </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-none">
+              {title}
+            </h2>
+            <p className="mt-4 text-muted-foreground max-w-md">{subtitle}</p>
+            <Link
+              to="/deals"
+              className="inline-block mt-4 text-sm font-medium underline-offset-4 hover:underline"
+            >
+              View all deals →
+            </Link>
           </div>
-          <div className="lg:col-span-6 flex items-center justify-start lg:justify-end gap-3 sm:gap-4">
+          <div className="lg:col-span-6 flex items-center justify-start lg:justify-end gap-2 sm:gap-4 flex-wrap">
+            {days > 0 && (
+              <>
+                <Cell value={days} label="Days" />
+                <span className="font-display text-3xl sm:text-4xl hidden sm:inline">:</span>
+              </>
+            )}
             <Cell value={hours} label="Hours" />
             <span className="font-display text-3xl sm:text-4xl">:</span>
             <Cell value={minutes} label="Minutes" />
@@ -38,8 +60,8 @@ const DailyDeals = ({ products = [] }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-1.5 gap-y-3 sm:gap-x-2 sm:gap-y-4 lg:grid-cols-4">
-          {products.slice(0, 4).map((p) => (
+        <div className="grid grid-cols-2 gap-x-1.5 gap-y-3 sm:gap-x-2 sm:gap-y-4 md:grid-cols-3 lg:grid-cols-4">
+          {products.slice(0, 8).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>

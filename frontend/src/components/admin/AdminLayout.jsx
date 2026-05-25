@@ -1,11 +1,12 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Package, ImageIcon, Settings as SettingsIcon, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Package, ImageIcon, Settings as SettingsIcon, LogOut, ExternalLink, Flame } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 
 const NAV = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
+  { to: "/admin/flash-deals", label: "Flash Deals", icon: Flame },
   { to: "/admin/settings", label: "Site Settings", icon: SettingsIcon },
 ];
 

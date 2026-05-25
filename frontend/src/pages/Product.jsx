@@ -5,8 +5,7 @@ import { api, getAffiliateClickUrl } from "../lib/api";
 import { useCurrency } from "../lib/currencyContext";
 import { getCategoryBySlug, categoryPath } from "../lib/categories";
 import { getProductImages } from "../lib/productImages";
-import ProductImageSlider from "../components/ProductImageSlider";
-import ProductVideo from "../components/ProductVideo";
+import ProductGallery from "../components/ProductGallery";
 import ProductCard from "../components/ProductCard";
 import { PageError } from "../components/PageState";
 
@@ -91,16 +90,11 @@ const ProductPage = () => {
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-10 lg:items-start">
           <div>
-            <ProductImageSlider
+            <ProductGallery
               images={images}
+              videoUrl={product.video_url}
               alt={product.title}
-              rounded="rounded-2xl"
-              autoPlay
-              intervalMs={4500}
-              enableMotion
-              className="w-full"
             />
-            {product.video_url && <ProductVideo url={product.video_url} title={product.title} />}
           </div>
 
           <div className="mt-5 lg:mt-0">

@@ -248,6 +248,84 @@ class SiteSettingsUpdate(BaseModel):
     countdown_enabled: Optional[bool] = None
 
 
+class FlashDeal(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str = "Limited Time Offers"
+    subtitle: str = "Premium pieces at unbeatable prices."
+    product_ids: List[str] = Field(default_factory=list)
+    starts_at: str = ""
+    ends_at: str = ""
+    is_enabled: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class FlashDealCreate(BaseModel):
+    title: str
+    subtitle: str = ""
+    product_ids: List[str] = Field(default_factory=list)
+    starts_at: str
+    ends_at: str
+    is_enabled: bool = True
+
+
+class FlashDealUpdate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    product_ids: Optional[List[str]] = None
+    starts_at: Optional[str] = None
+    ends_at: Optional[str] = None
+    is_enabled: Optional[bool] = None
+
+
+class FlashDealActiveResponse(BaseModel):
+    campaign: Optional[dict] = None
+    products: List[dict] = Field(default_factory=list)
+
+
+def _parse_iso_dt(value: str) -> datetime:
+    if not value:
+        return datetime.now(timezone.utc)
+    s = value.replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def flash_deal_status(deal: dict) -> str:
+    if not deal.get("is_enabled"):
+        return "draft"
+    now = datetime.now(timezone.utc)
+    start = _parse_iso_dt(deal.get("starts_at", ""))
+    end = _parse_iso_dt(deal.get("ends_at", ""))
+    if now < start:
+        return "scheduled"
+    if now > end:
+        return "ended"
+    return "live"
+
+
+def _flash_deal_with_status(doc: dict) -> dict:
+    out = dict(doc)
+    if isinstance(out.get("created_at"), datetime):
+        out["created_at"] = out["created_at"].isoformat()
+    out["status"] = flash_deal_status(out)
+    return out
+
+
+async def _load_flash_deal_products(product_ids: List[str]) -> List[dict]:
+    products = []
+    for pid in product_ids:
+        doc = await db.products.find_one({"id": pid}, {"_id": 0})
+        if doc:
+            products.append(normalize_product_dict(doc))
+    return products
+
+
 # ============== EMAIL HELPER ==============
 async def send_email_via_resend(to: str, subject: str, html: str) -> bool:
     resend_key = os.environ.get("RESEND_API_KEY")
@@ -558,6 +636,66 @@ async def delete_banner(banner_id: str, _: dict = Depends(get_current_admin)):
     return {"ok": True}
 
 
+# ----- Flash deals (limited-time campaigns) -----
+@api_router.get("/flash-deals/active", response_model=FlashDealActiveResponse)
+async def get_active_flash_deal():
+    now = datetime.now(timezone.utc).isoformat()
+    live = await db.flash_deals.find(
+        {
+            "is_enabled": True,
+            "starts_at": {"$lte": now},
+            "ends_at": {"$gte": now},
+        },
+        {"_id": 0},
+    ).sort("ends_at", 1).to_list(1)
+    doc = live[0] if live else None
+    if not doc:
+        return {"campaign": None, "products": []}
+    campaign = _flash_deal_with_status(doc)
+    products = await _load_flash_deal_products(doc.get("product_ids", []))
+    return {"campaign": campaign, "products": products}
+
+
+@api_router.get("/flash-deals")
+async def list_flash_deals(_: dict = Depends(get_current_admin)):
+    docs = await db.flash_deals.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    result = []
+    for doc in docs:
+        item = _flash_deal_with_status(doc)
+        item["products"] = await _load_flash_deal_products(doc.get("product_ids", []))
+        result.append(item)
+    return result
+
+
+@api_router.post("/flash-deals", response_model=FlashDeal)
+async def create_flash_deal(payload: FlashDealCreate, _: dict = Depends(get_current_admin)):
+    deal = FlashDeal(**payload.model_dump())
+    doc = deal.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.flash_deals.insert_one(doc)
+    return deal
+
+
+@api_router.patch("/flash-deals/{deal_id}", response_model=FlashDeal)
+async def update_flash_deal(deal_id: str, payload: FlashDealUpdate, _: dict = Depends(get_current_admin)):
+    updates = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    res = await db.flash_deals.update_one({"id": deal_id}, {"$set": updates})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Flash deal not found")
+    doc = await db.flash_deals.find_one({"id": deal_id}, {"_id": 0})
+    return doc
+
+
+@api_router.delete("/flash-deals/{deal_id}")
+async def delete_flash_deal(deal_id: str, _: dict = Depends(get_current_admin)):
+    res = await db.flash_deals.delete_one({"id": deal_id})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Flash deal not found")
+    return {"ok": True}
+
+
 # ----- Site Settings (singleton) -----
 async def _get_settings_doc() -> dict:
     doc = await db.site_settings.find_one({"_id": "singleton"}, {"_id": 0})
@@ -757,6 +895,27 @@ async def startup_event():
         logger.error(f"Product seed error: {e}")
 
     try:
+        flash_count = await db.flash_deals.count_documents({})
+        if flash_count == 0:
+            now = datetime.now(timezone.utc)
+            end = now.replace(hour=23, minute=59, second=59, microsecond=999000)
+            deal_ids = []
+            async for p in db.products.find({"is_daily_deal": True}, {"id": 1}):
+                deal_ids.append(p["id"])
+            if deal_ids:
+                campaign = FlashDeal(
+                    title="Daily Deals",
+                    subtitle="Gone when the timer hits zero.",
+                    product_ids=deal_ids,
+                    starts_at=now.isoformat(),
+                    ends_at=end.isoformat(),
+                    is_enabled=True,
+                )
+                doc = campaign.model_dump()
+                doc["created_at"] = doc["created_at"].isoformat()
+                await db.flash_deals.insert_one(doc)
+                logger.info(f"Seeded flash deal campaign with {len(deal_ids)} products")
+
         cat_banner_count = await db.banners.count_documents({"position": "category"})
         if cat_banner_count == 0:
             for payload in _category_banner_defaults():
