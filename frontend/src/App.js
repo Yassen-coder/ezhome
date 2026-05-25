@@ -18,6 +18,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
+import ProductPage from "./pages/Product";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
@@ -61,6 +62,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/"                    element={<Home />} />
         <Route path="/products"            element={<Products />} />
+        <Route path="/p/:id"               element={<ProductPage />} />
         <Route path="/category/:slug"      element={<Category />} />
         <Route path="/deals"               element={<Deals />} />
         <Route path="/about"               element={<About />} />

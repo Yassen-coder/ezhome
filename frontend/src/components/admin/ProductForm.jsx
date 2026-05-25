@@ -7,6 +7,7 @@ const SOURCES = ["amazon", "temu", "shein"];
 
 const empty = {
   title: "", description: "", short_description: "", image_url: "",
+  secondary_image_url: "",
   category: "smart-home", source: "amazon", affiliate_url: "",
   original_price: 0, discounted_price: 0, rating: 4.5, review_count: 0,
   badges: "", is_trending: false, is_best_seller: false, is_daily_deal: false,
@@ -60,6 +61,16 @@ const ProductForm = ({ initial, onSubmit, onCancel, submitLabel = "Save" }) => {
       </Field>
       <Field label="Image URL" full required>
         <input required type="url" value={form.image_url} onChange={(e) => update("image_url", e.target.value)} className={inputCls} />
+      </Field>
+      <Field label="Second image URL (slider)" full>
+        <input
+          type="url"
+          value={form.secondary_image_url || ""}
+          onChange={(e) => update("secondary_image_url", e.target.value)}
+          placeholder="Optional — enables image slider on product cards"
+          className={inputCls}
+          data-testid="form-secondary-image"
+        />
       </Field>
       <Field label="Affiliate URL" full required>
         <input required type="url" value={form.affiliate_url} onChange={(e) => update("affiliate_url", e.target.value)} className={inputCls} />

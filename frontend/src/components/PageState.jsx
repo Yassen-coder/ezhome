@@ -1,27 +1,21 @@
 import { RefreshCw } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 
-export const ProductGridSkeleton = ({ count = 4, columns = 4 }) => {
-  const cols = {
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-  }[columns];
-
-  return (
-    <div className={`grid ${cols} gap-5 sm:gap-6 lg:gap-8`} data-testid="product-grid-skeleton">
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="aspect-[4/5] w-full rounded-none" />
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-5 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      ))}
-    </div>
-  );
-};
+export const ProductGridSkeleton = ({ count = 8 }) => (
+  <div
+    className="grid grid-cols-2 gap-x-1.5 gap-y-3 sm:gap-x-2 sm:gap-y-4 md:grid-cols-3 lg:grid-cols-4"
+    data-testid="product-grid-skeleton"
+  >
+    {Array.from({ length: count }).map((_, i) => (
+      <div key={i} className="space-y-2">
+        <Skeleton className="aspect-[3/4] w-full rounded-xl" />
+        <Skeleton className="h-3 w-full rounded-md" />
+        <Skeleton className="h-3 w-2/3 rounded-md" />
+        <Skeleton className="h-4 w-1/2 rounded-md" />
+      </div>
+    ))}
+  </div>
+);
 
 export const PageLoading = ({ message = "Loading…" }) => (
   <div className="container-px mx-auto max-w-[1400px] py-20" data-testid="page-loading">

@@ -112,6 +112,24 @@
 }
 .marquee-track { animation: marquee 38s linear infinite; }
 
+/* Product image slider — SHEIN-style subtle motion */
+@keyframes productKenBurns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.07) translate(-1.5%, -0.5%); }
+}
+@keyframes productDrift {
+  0% { transform: scale(1.02) translateX(0); }
+  100% { transform: scale(1.06) translateX(-2%); }
+}
+.product-slider-kenburns {
+  animation: productKenBurns 7s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.product-slider-drift {
+  animation: productDrift 5.5s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
 @layer base {
   [data-debug-wrapper="true"] { display: contents !important; }
 }

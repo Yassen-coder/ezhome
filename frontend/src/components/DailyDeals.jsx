@@ -38,9 +38,9 @@ const DailyDeals = ({ products = [] }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8">
-          {products.slice(0, 4).map((p, i) => (
-            <ProductCard key={p.id} product={p} ctaIndex={i + 1} />
+        <div className="grid grid-cols-2 gap-x-1.5 gap-y-3 sm:gap-x-2 sm:gap-y-4 lg:grid-cols-4">
+          {products.slice(0, 4).map((p) => (
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </div>
