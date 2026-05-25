@@ -6,18 +6,7 @@ import { useSettings } from "../lib/settings";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Input } from "./ui/input";
 import CurrencySelector from "./CurrencySelector";
-
-const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Shop", to: "/products" },
-  { label: "Smart Home", to: "/category/smart-home" },
-  { label: "Kitchen", to: "/category/kitchen" },
-  { label: "Decor", to: "/category/decor" },
-  { label: "Organization", to: "/category/organization" },
-  { label: "TikTok Finds", to: "/category/tiktok" },
-  { label: "Fashion", to: "/category/fashion" },
-  { label: "Deals", to: "/deals" },
-];
+import { NAV_CATEGORY_LINKS } from "../lib/categories";
 
 const Navbar = () => {
   const { theme, toggle } = useTheme();
@@ -67,7 +56,7 @@ const Navbar = () => {
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] bg-background overflow-y-auto">
                 <div className="flex flex-col gap-1 pt-8">
-                  {NAV_LINKS.map((l) => (
+                  {NAV_CATEGORY_LINKS.map((l) => (
                     <Link
                       key={l.to}
                       to={l.to}
@@ -111,7 +100,7 @@ const Navbar = () => {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-8">
-            {NAV_LINKS.map((l) => (
+            {NAV_CATEGORY_LINKS.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}

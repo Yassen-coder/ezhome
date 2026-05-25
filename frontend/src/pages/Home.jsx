@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { api } from "../lib/api";
 import { useSettings } from "../lib/settings";
+import { SITE_CATEGORIES, categoryPath } from "../lib/categories";
 import Hero from "../components/Hero";
 import TrustBadges from "../components/TrustBadges";
 import ProductGrid from "../components/ProductGrid";
@@ -9,9 +10,16 @@ import DailyDeals from "../components/DailyDeals";
 import Testimonials from "../components/Testimonials";
 import { ProductGridSkeleton, InlineErrorBanner } from "../components/PageState";
 
+const categoryKeys = SITE_CATEGORIES.reduce((acc, c) => {
+  acc[c.slug] = [];
+  return acc;
+}, {});
+
 const EMPTY = {
-  trending: [], bestSellers: [], smartHome: [], kitchen: [],
-  decor: [], organization: [], tiktok: [], fashion: [], deals: [],
+  trending: [],
+  bestSellers: [],
+  deals: [],
+  ...categoryKeys,
 };
 
 const Home = () => {
@@ -24,27 +32,24 @@ const Home = () => {
     setStatus("loading");
     setErrorMsg("");
     try {
-      const [trending, bestSellers, smartHome, kitchen, decor, organization, tiktok, fashion, deals] = await Promise.all([
+      const categoryRequests = SITE_CATEGORIES.map((c) =>
+        api.get("/products", { params: { category: c.slug, limit: 4 } })
+      );
+      const [trending, bestSellers, deals, ...categoryResults] = await Promise.all([
         api.get("/products", { params: { trending: true, limit: 8 } }),
         api.get("/products", { params: { best_seller: true, limit: 8 } }),
-        api.get("/products", { params: { category: "smart-home", limit: 4 } }),
-        api.get("/products", { params: { category: "kitchen", limit: 4 } }),
-        api.get("/products", { params: { category: "decor", limit: 4 } }),
-        api.get("/products", { params: { category: "organization", limit: 4 } }),
-        api.get("/products", { params: { category: "tiktok", limit: 8 } }),
-        api.get("/products", { params: { category: "fashion", limit: 8 } }),
         api.get("/products", { params: { daily_deal: true, limit: 4 } }),
+        ...categoryRequests,
       ]);
+      const byCategory = {};
+      SITE_CATEGORIES.forEach((c, i) => {
+        byCategory[c.slug] = categoryResults[i].data;
+      });
       setData({
         trending: trending.data,
         bestSellers: bestSellers.data,
-        smartHome: smartHome.data,
-        kitchen: kitchen.data,
-        decor: decor.data,
-        organization: organization.data,
-        tiktok: tiktok.data,
-        fashion: fashion.data,
         deals: deals.data,
+        ...byCategory,
       });
       setStatus("success");
     } catch {
@@ -61,11 +66,9 @@ const Home = () => {
 
   return (
     <div data-testid="home-page">
-      <Hero featured={data.trending} />
+      <Hero />
       <TrustBadges />
-      {status === "error" && (
-        <InlineErrorBanner message={errorMsg} onRetry={load} />
-      )}
+      {status === "error" && <InlineErrorBanner message={errorMsg} onRetry={load} />}
       {loading ? (
         <>
           <section className="container-px mx-auto max-w-[1400px] py-16 sm:py-24">
@@ -78,16 +81,34 @@ const Home = () => {
         </>
       ) : (
         <>
-          <ProductGrid title="Trending Now" overline="What's hot this week" subtitle="The pieces flying off shelves. Don't sleep on these." products={data.trending} viewAllLink="/products" />
+          <ProductGrid
+            title="Trending Now"
+            overline="What's hot this week"
+            subtitle="The pieces flying off shelves. Don't sleep on these."
+            products={data.trending}
+            viewAllLink="/products"
+          />
           <CategoryBento />
-          <ProductGrid title="Best Sellers" overline="Customer favorites" products={data.bestSellers} viewAllLink="/products" />
+          <ProductGrid
+            title="Best Sellers"
+            overline="Customer favorites"
+            products={data.bestSellers}
+            viewAllLink="/products"
+          />
           {data.deals.length > 0 && countdown_enabled && <DailyDeals products={data.deals} />}
-          <ProductGrid title="Smart Home" overline="Effortless luxury, automated" products={data.smartHome} viewAllLink="/category/smart-home" />
-          <ProductGrid title="Kitchen Essentials" overline="For the modern cook" products={data.kitchen} viewAllLink="/category/kitchen" />
-          <ProductGrid title="Home Decor" overline="Quietly stunning pieces" products={data.decor} viewAllLink="/category/decor" />
-          <ProductGrid title="Organization & Storage" overline="Order, beautifully" products={data.organization} viewAllLink="/category/organization" />
-          <ProductGrid title="Viral TikTok Finds" overline="As seen on your FYP" products={data.tiktok} viewAllLink="/category/tiktok" />
-          <ProductGrid title="SHEIN Fashion Picks" overline="Style, curated" products={data.fashion} viewAllLink="/category/fashion" />
+          {SITE_CATEGORIES.map((c) => {
+            const products = data[c.slug] || [];
+            if (products.length === 0) return null;
+            return (
+              <ProductGrid
+                key={c.slug}
+                title={c.name}
+                overline={c.overline}
+                products={products}
+                viewAllLink={categoryPath(c.slug)}
+              />
+            );
+          })}
         </>
       )}
       {!loading && <Testimonials />}

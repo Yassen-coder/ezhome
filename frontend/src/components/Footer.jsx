@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Music2, Youtube, Twitter, Mail } from "lucide-react";
+import { SITE_CATEGORIES, categoryPath } from "../lib/categories";
 
 const Footer = () => {
   return (
@@ -10,7 +11,7 @@ const Footer = () => {
             EzHome<span className="text-accent">.</span>
           </h3>
           <p className="mt-4 text-sm text-muted-foreground max-w-xs leading-relaxed">
-            Curated essentials from the world's best brands. Discover viral finds, premium home goods, and TikTok-famous gems — all in one place.
+            Curated essentials for kitchen, cleaning, organization, smart home, decor, and daily living — all in one place.
           </p>
           <div className="flex items-center gap-4 mt-6">
             <a href="#" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} /></a>
@@ -22,12 +23,13 @@ const Footer = () => {
         <div>
           <p className="overline mb-4">Shop</p>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/category/smart-home" className="hover:opacity-60">Smart Home</Link></li>
-            <li><Link to="/category/kitchen" className="hover:opacity-60">Kitchen</Link></li>
-            <li><Link to="/category/decor" className="hover:opacity-60">Home Decor</Link></li>
-            <li><Link to="/category/organization" className="hover:opacity-60">Organization</Link></li>
-            <li><Link to="/category/tiktok" className="hover:opacity-60">TikTok Finds</Link></li>
-            <li><Link to="/category/fashion" className="hover:opacity-60">Fashion</Link></li>
+            {SITE_CATEGORIES.map((c) => (
+              <li key={c.slug}>
+                <Link to={categoryPath(c.slug)} className="hover:opacity-60">
+                  {c.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>

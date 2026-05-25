@@ -4,7 +4,9 @@ import { toast } from "sonner";
 import { Plus, Trash2, Pencil, Search, X } from "lucide-react";
 import ProductForm from "../../components/admin/ProductForm";
 
-const CATS = ["all", "smart-home", "kitchen", "decor", "organization", "tiktok", "fashion"];
+import { CATEGORY_SLUGS } from "../../lib/categories";
+
+const CATS = ["all", ...CATEGORY_SLUGS];
 
 const Products = () => {
   const [products, setProducts] = useState([]);

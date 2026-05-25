@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
-const CATEGORIES = ["smart-home", "kitchen", "decor", "organization", "tiktok", "fashion"];
+import { CATEGORY_SLUGS } from "../../lib/categories";
+
+const CATEGORIES = CATEGORY_SLUGS;
 const SOURCES = ["amazon", "temu", "shein"];
 
 const empty = {

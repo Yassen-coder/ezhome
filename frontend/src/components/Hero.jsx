@@ -35,7 +35,7 @@ const CtaLink = ({ to, children, className, testId }) => {
   );
 };
 
-const Hero = ({ featured = [] }) => {
+const Hero = () => {
   const { hero_overline, hero_eyebrow_enabled } = useSettings();
   const [banners, setBanners] = useState([]);
 
@@ -53,9 +53,8 @@ const Hero = ({ featured = [] }) => {
   const trending = banners[4];
 
   const heroImg = main?.image_url || FALLBACK_HERO;
-  const sideImg1 = side1?.image_url || featured[0]?.image_url || FALLBACK_SIDE1;
-  const sideImg2 = side2?.image_url || featured[1]?.image_url || FALLBACK_SIDE2;
-
+  const sideImg1 = side1?.image_url || FALLBACK_SIDE1;
+  const sideImg2 = side2?.image_url || FALLBACK_SIDE2;
   const mainOverline = main?.subtitle || "Editor's Pick";
   const mainTitle = main?.title || "Sanctuary Edit";
 
@@ -64,7 +63,7 @@ const Hero = ({ featured = [] }) => {
   const promoLink = promo?.cta_link;
 
   const trendingOverline = trending?.subtitle || "Trending Now";
-  const trendingTitle = trending?.title || "TikTok's #1 Home Aesthetic Finds";
+  const trendingTitle = trending?.title || "Curated picks for every room";
   const trendingLink = trending?.cta_link;
 
   return (
@@ -84,8 +83,8 @@ const Hero = ({ featured = [] }) => {
             Shop <span className="text-accent">smarter.</span>
           </h1>
           <p className="mt-6 sm:mt-8 text-base sm:text-lg text-muted-foreground max-w-md leading-relaxed">
-            Hand-picked essentials from Amazon, Temu, and SHEIN — all the viral finds and
-            timeless pieces, curated for the modern home.
+            Hand-picked home essentials across kitchen, cleaning, organization, smart home,
+            decor, and daily living — curated for the modern home.
           </p>
           <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3">
             {main?.cta_link ? (
@@ -106,11 +105,11 @@ const Hero = ({ featured = [] }) => {
               </Link>
             )}
             <Link
-              to="/category/tiktok"
+              to="/category/cleaning"
               className="inline-flex items-center justify-center px-7 py-4 border border-foreground text-foreground font-medium text-sm tracking-wide transition-all duration-300 hover:bg-foreground hover:text-background"
-              data-testid="hero-cta-viral"
+              data-testid="hero-cta-secondary"
             >
-              See Viral Finds
+              Shop Cleaning
             </Link>
           </div>
           <div className="mt-10 sm:mt-14 grid grid-cols-3 gap-4 sm:gap-8 max-w-md">
@@ -153,10 +152,10 @@ const Hero = ({ featured = [] }) => {
             </div>
           </CtaLink>
           <div className="col-span-2 row-span-2 relative overflow-hidden bg-muted">
-            <img src={sideImg1} alt={side1?.title || "Featured"} loading="eager" className="w-full h-full object-cover" />
+            <img src={sideImg1} alt={side1?.title || "Hero"} loading="eager" className="w-full h-full object-cover" />
           </div>
           <div className="col-span-2 row-span-2 relative overflow-hidden bg-muted">
-            <img src={sideImg2} alt={side2?.title || "Featured"} loading="eager" className="w-full h-full object-cover" />
+            <img src={sideImg2} alt={side2?.title || "Hero"} loading="eager" className="w-full h-full object-cover" />
           </div>
           <CtaLink
             to={promoLink}
@@ -187,7 +186,7 @@ const Hero = ({ featured = [] }) => {
                 "FREE SHIPPING $50+",
                 "VERIFIED REVIEWS",
                 "AMAZON ASSOCIATE",
-                "TIKTOK FAVORITES",
+                "HOME ESSENTIALS",
                 "DAILY NEW DROPS",
                 "SHIPS WORLDWIDE",
                 "30-DAY RETURNS",

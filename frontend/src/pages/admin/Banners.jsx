@@ -57,7 +57,9 @@ const Banners = () => {
         <div>
           <p className="overline text-muted-foreground mb-2">Promotions</p>
           <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">Banners</h1>
-          <p className="text-sm text-muted-foreground mt-2">Manage hero and promotional banners shown across the site.</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Hero = homepage bento (order 0–4). Category = &quot;Categories that feel like you&quot; tiles (set CTA link to /category/slug).
+          </p>
         </div>
         <button onClick={() => open(null)} className="inline-flex items-center gap-2 px-5 py-3 bg-foreground text-background text-sm font-semibold hover:bg-accent hover:text-accent-foreground transition-colors" data-testid="admin-add-banner">
           <Plus className="w-4 h-4" /> New banner
@@ -76,10 +78,9 @@ const Banners = () => {
           <Field label="CTA text"><input value={form.cta_text} onChange={(e) => setForm({ ...form, cta_text: e.target.value })} className={ic} /></Field>
           <Field label="CTA link (path or URL)"><input value={form.cta_link} onChange={(e) => setForm({ ...form, cta_link: e.target.value })} className={ic} /></Field>
           <Field label="Position">
-            <select value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} className={ic}>
-              <option value="hero">hero</option>
-              <option value="promo">promo</option>
-              <option value="featured">featured</option>
+            <select value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} className={ic} data-testid="banner-position">
+              <option value="hero">hero — homepage bento</option>
+              <option value="category">category — mood grid</option>
             </select>
           </Field>
           <Field label="Order"><input type="number" value={form.order} onChange={(e) => setForm({ ...form, order: parseInt(e.target.value || 0, 10) })} className={ic} /></Field>

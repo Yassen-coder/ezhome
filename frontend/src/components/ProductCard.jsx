@@ -1,20 +1,12 @@
 import { Star } from "lucide-react";
 import { getAffiliateClickUrl } from "../lib/api";
 import { useCurrency } from "../lib/currencyContext";
+import { getCategoryBySlug } from "../lib/categories";
 
 const SOURCE_LABEL = {
   amazon: "Amazon",
   temu: "Temu",
   shein: "SHEIN",
-};
-
-const CATEGORY_LABELS = {
-  "smart-home": "Smart Home",
-  "kitchen": "Kitchen",
-  "decor": "Decor",
-  "organization": "Organization",
-  "tiktok": "TikTok Finds",
-  "fashion": "Fashion",
 };
 
 const CTA_LABELS = ["Shop Now", "View Deal", "Get Yours"];
@@ -28,7 +20,9 @@ const ProductCard = ({ product, ctaIndex = 0 }) => {
         )
       : 0;
   const cta = CTA_LABELS[ctaIndex % CTA_LABELS.length];
-  const categoryLabel = CATEGORY_LABELS[product.category] || product.category.replaceAll("-", " ");
+  const categoryLabel =
+    getCategoryBySlug(product.category)?.name ||
+    product.category.replaceAll("-", " ");
 
   return (
     <article

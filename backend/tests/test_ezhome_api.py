@@ -68,7 +68,9 @@ def test_categories(s):
     r = s.get(f"{API}/categories")
     assert r.status_code == 200
     slugs = {c["slug"] for c in r.json()["categories"]}
-    assert {"smart-home", "kitchen", "decor", "organization", "tiktok", "fashion"} == slugs
+    assert {
+        "kitchen", "cleaning", "organization", "smart-home", "decor", "daily-essentials"
+    } == slugs
 
 
 # ---------- Click redirect ----------

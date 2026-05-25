@@ -10,7 +10,7 @@ const reviews = [
   {
     name: "Marcus T.",
     role: "Los Angeles, CA",
-    text: "The TikTok finds section is dangerous in the best way. Already ordered 3 things this month. Quality is consistently better than expected.",
+    text: "The daily essentials and cleaning picks are dangerous in the best way. Already ordered 3 things this month. Quality is consistently better than expected.",
     product: "Aura Smart Lamp",
   },
   {

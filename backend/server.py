@@ -340,18 +340,19 @@ async def delete_product(product_id: str, _: dict = Depends(get_current_admin)):
 
 
 # ----- Categories -----
+SITE_CATEGORIES = [
+    {"slug": "kitchen", "name": "Kitchen", "description": "Tools that make cooking effortless"},
+    {"slug": "cleaning", "name": "Cleaning", "description": "Supplies and tools for a cleaner home"},
+    {"slug": "organization", "name": "Organization", "description": "Order, beautifully designed"},
+    {"slug": "smart-home", "name": "Smart Home", "description": "Cutting-edge devices for the modern home"},
+    {"slug": "decor", "name": "Decor", "description": "Pieces that transform your space"},
+    {"slug": "daily-essentials", "name": "Daily Essentials", "description": "Everyday must-haves for modern living"},
+]
+
+
 @api_router.get("/categories")
 async def list_categories():
-    return {
-        "categories": [
-            {"slug": "smart-home", "name": "Smart Home", "description": "Cutting-edge devices for the modern home"},
-            {"slug": "kitchen", "name": "Kitchen Essentials", "description": "Tools that make cooking effortless"},
-            {"slug": "decor", "name": "Home Decor", "description": "Pieces that transform your space"},
-            {"slug": "organization", "name": "Organization & Storage", "description": "Order, beautifully designed"},
-            {"slug": "tiktok", "name": "Viral TikTok Finds", "description": "What everyone's talking about"},
-            {"slug": "fashion", "name": "SHEIN Fashion Picks", "description": "Curated style, delivered"},
-        ]
-    }
+    return {"categories": SITE_CATEGORIES}
 
 
 # ----- Click tracking + redirect -----
@@ -593,17 +594,40 @@ def _build_seed_data():
         {"title": "Luma Acrylic Drawer Organizers", "short_description": "Find everything in 2 seconds.", "description": "12-piece modular acrylic system.", "image_url": "https://images.unsplash.com/photo-1606744824163-985d376605aa?w=800&q=85", "category": "organization", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0ORG01", "original_price": 49.00, "discounted_price": 29.00, "rating": 4.8, "review_count": 3892, "badges": ["BEST SELLER"], "is_best_seller": True, "is_trending": True},
         {"title": "Tessa Woven Storage Baskets", "short_description": "Storage that doubles as decor.", "description": "Hand-woven seagrass baskets, set of 3.", "image_url": "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&q=85", "category": "organization", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0ORG03", "original_price": 65.00, "discounted_price": 39.00, "rating": 4.7, "review_count": 1574, "badges": []},
         {"title": "Pico Cable Management Box", "short_description": "Hide the chaos, beautifully.", "description": "Bamboo-topped cable organizer.", "image_url": "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=800&q=85", "category": "organization", "source": "temu", "affiliate_url": "https://temu.com/cable-box", "original_price": 29.00, "discounted_price": 16.00, "rating": 4.5, "review_count": 921, "badges": ["VIRAL"]},
-        # --- TikTok Finds ---
-        {"title": "Bloom Rotating Makeup Organizer", "short_description": "TikTok's most-viewed beauty hack.", "description": "360° rotating acrylic vanity organizer.", "image_url": "https://images.unsplash.com/photo-1631214540242-3cd8c4b0b3b9?w=800&q=85", "category": "tiktok", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0TIK01", "original_price": 49.00, "discounted_price": 28.00, "rating": 4.7, "review_count": 12490, "badges": ["VIRAL"], "is_trending": True, "is_best_seller": True},
-        {"title": "Cloud Slipper Slides", "short_description": "Walking on actual clouds.", "description": "Ultra-cushioned pillow slides.", "image_url": "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=800&q=85", "category": "tiktok", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0TIK02", "original_price": 39.00, "discounted_price": 19.00, "rating": 4.8, "review_count": 24891, "badges": ["VIRAL"], "is_trending": True},
-        {"title": "Hydro Glow Water Bottle", "short_description": "Hydration goals, achieved.", "description": "32oz motivational time-marker bottle.", "image_url": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&q=85", "category": "tiktok", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0TIK03", "original_price": 35.00, "discounted_price": 22.00, "rating": 4.9, "review_count": 18203, "badges": ["VIRAL"], "is_trending": True, "is_daily_deal": True},
-        {"title": "Aura LED Strip Lights", "short_description": "Vibe-shift your entire room.", "description": "50ft RGB LED strips with music sync and app control.", "image_url": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=800&q=85", "category": "tiktok", "source": "temu", "affiliate_url": "https://temu.com/led-strips", "original_price": 29.00, "discounted_price": 14.00, "rating": 4.6, "review_count": 9821, "badges": ["50% OFF"], "is_daily_deal": True},
-        {"title": "Mini Stapler Handbag", "short_description": "The viral micro-bag of the year.", "description": "Compact crossbody in buttery vegan leather.", "image_url": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=85", "category": "tiktok", "source": "shein", "affiliate_url": "https://shein.com/mini-bag", "original_price": 32.00, "discounted_price": 18.00, "rating": 4.5, "review_count": 7821, "badges": ["VIRAL"], "is_trending": True},
-        # --- Fashion ---
-        {"title": "Linen Wide Leg Trousers", "short_description": "Effortless cool, every wear.", "description": "Flowy linen-blend trousers in oat.", "image_url": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=85", "category": "fashion", "source": "shein", "affiliate_url": "https://shein.com/trousers", "original_price": 39.00, "discounted_price": 22.00, "rating": 4.6, "review_count": 3421, "badges": ["BEST SELLER"], "is_best_seller": True},
-        {"title": "Slip Satin Midi Dress", "short_description": "Quietly stunning, always.", "description": "Bias-cut satin in champagne.", "image_url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=85", "category": "fashion", "source": "shein", "affiliate_url": "https://shein.com/slip-dress", "original_price": 45.00, "discounted_price": 26.00, "rating": 4.5, "review_count": 5273, "badges": ["VIRAL"], "is_trending": True},
-        {"title": "Gold Hoop Earring Set", "short_description": "Five hoops, infinite looks.", "description": "5-pack 18k gold-plated hoops in varied sizes.", "image_url": "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=800&q=85", "category": "fashion", "source": "shein", "affiliate_url": "https://shein.com/hoops", "original_price": 28.00, "discounted_price": 15.00, "rating": 4.8, "review_count": 6921, "badges": ["BEST SELLER"], "is_best_seller": True},
-        {"title": "Knit Bodycon Mini Dress", "short_description": "The girls-night staple.", "description": "Ribbed knit dress in espresso.", "image_url": "https://images.unsplash.com/photo-1612722432474-b971cdcea546?w=800&q=85", "category": "fashion", "source": "shein", "affiliate_url": "https://shein.com/knit-dress", "original_price": 35.00, "discounted_price": 19.00, "rating": 4.5, "review_count": 4102, "badges": []},
+        # --- Cleaning ---
+        {"title": "PureWave Cordless Vacuum", "short_description": "Lightweight power for every corner.", "description": "Handheld cordless vacuum with HEPA filter and 40-min runtime.", "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85", "category": "cleaning", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0CLEAN01", "original_price": 129.00, "discounted_price": 89.00, "rating": 4.8, "review_count": 4210, "badges": ["BEST SELLER"], "is_best_seller": True, "is_trending": True},
+        {"title": "Microfiber Mop System", "short_description": "Streak-free floors in minutes.", "description": "Flat mop with washable pads and extendable handle.", "image_url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&q=85", "category": "cleaning", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0CLEAN02", "original_price": 45.00, "discounted_price": 28.00, "rating": 4.7, "review_count": 2891, "badges": ["VIRAL"], "is_trending": True},
+        {"title": "Eco Dish Soap Dispenser Set", "short_description": "Refillable, minimal, countertop-ready.", "description": "Glass dispenser trio for kitchen sink organization.", "image_url": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a1c?w=800&q=85", "category": "cleaning", "source": "temu", "affiliate_url": "https://temu.com/dispenser", "original_price": 32.00, "discounted_price": 18.00, "rating": 4.6, "review_count": 1102, "badges": [], "is_daily_deal": True},
+        # --- Daily Essentials ---
+        {"title": "Hydro Glow Water Bottle", "short_description": "Hydration goals, achieved.", "description": "32oz motivational time-marker bottle.", "image_url": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&q=85", "category": "daily-essentials", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0DAILY01", "original_price": 35.00, "discounted_price": 22.00, "rating": 4.9, "review_count": 18203, "badges": ["BEST SELLER"], "is_trending": True, "is_daily_deal": True},
+        {"title": "Cloud Comfort Slides", "short_description": "Walking on actual clouds.", "description": "Ultra-cushioned pillow slides for home.", "image_url": "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=800&q=85", "category": "daily-essentials", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0DAILY02", "original_price": 39.00, "discounted_price": 19.00, "rating": 4.8, "review_count": 24891, "badges": ["VIRAL"], "is_trending": True},
+        {"title": "Bamboo Bath Towel Set", "short_description": "Spa-soft, quick-dry luxury.", "description": "6-piece ultra-absorbent towel set in sand.", "image_url": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=85", "category": "daily-essentials", "source": "amazon", "affiliate_url": "https://amazon.com/dp/B0DAILY03", "original_price": 79.00, "discounted_price": 49.00, "rating": 4.7, "review_count": 3421, "badges": ["35% OFF"], "is_best_seller": True},
+        {"title": "Aroma Sleep Pillow Spray", "short_description": "Wind down in one mist.", "description": "Lavender-chamomile pillow mist, 100ml.", "image_url": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&q=85", "category": "daily-essentials", "source": "temu", "affiliate_url": "https://temu.com/pillow-spray", "original_price": 24.00, "discounted_price": 14.00, "rating": 4.6, "review_count": 1821, "badges": []},
+    ]
+
+
+def _category_banner_defaults():
+    """Default homepage category tiles (position=category) — editable in admin."""
+    tiles = [
+        ("smart-home", "Smart Home", "Effortless luxury, automated", "https://images.unsplash.com/photo-1558002038-1055907df827?w=900&q=85", 0),
+        ("kitchen", "Kitchen", "For the modern cook", "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=85", 1),
+        ("decor", "Decor", "Quietly stunning pieces", "https://images.unsplash.com/photo-1584100936595-c0654b55a2e6?w=900&q=85", 2),
+        ("cleaning", "Cleaning", "A cleaner home, effortlessly", "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&q=85", 3),
+        ("organization", "Organization", "Order, beautifully", "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=900&q=85", 4),
+        ("daily-essentials", "Daily Essentials", "Everyday must-haves", "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&q=85", 5),
+    ]
+    return [
+        {
+            "title": title,
+            "subtitle": subtitle,
+            "image_url": img,
+            "cta_text": "Explore",
+            "cta_link": f"/category/{slug}",
+            "position": "category",
+            "order": order,
+            "is_active": True,
+        }
+        for slug, title, subtitle, img, order in tiles
     ]
 
 
@@ -657,6 +681,14 @@ async def startup_event():
         logger.error(f"Admin seed error: {e}")
 
     try:
+        # Migrate legacy categories off the site
+        for old_cat, new_cat in [("tiktok", "daily-essentials"), ("fashion", "daily-essentials")]:
+            res = await db.products.update_many(
+                {"category": old_cat}, {"$set": {"category": new_cat}}
+            )
+            if res.modified_count:
+                logger.info(f"Migrated {res.modified_count} products from {old_cat} to {new_cat}")
+
         count = await db.products.count_documents({})
         if count == 0:
             seed_data = _build_seed_data()
@@ -668,6 +700,18 @@ async def startup_event():
             logger.info(f"Seeded {len(seed_data)} products")
     except Exception as e:
         logger.error(f"Product seed error: {e}")
+
+    try:
+        cat_banner_count = await db.banners.count_documents({"position": "category"})
+        if cat_banner_count == 0:
+            for payload in _category_banner_defaults():
+                banner = Banner(**payload)
+                doc = banner.model_dump()
+                doc["created_at"] = doc["created_at"].isoformat()
+                await db.banners.insert_one(doc)
+            logger.info("Seeded default category banners")
+    except Exception as e:
+        logger.error(f"Category banner seed error: {e}")
 
 
 @app.on_event("shutdown")
