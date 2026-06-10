@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Music2, Youtube, Twitter, ParkingCircle, Mail } from "lucide-react";
+import { Instagram, Music2, Twitter, ParkingCircle, Mail } from "lucide-react";
 import { SITE_CATEGORIES, categoryPath } from "../lib/categories";
 
 const Footer = () => {
@@ -17,7 +17,6 @@ const Footer = () => {
             <a href="https://www.instagram.com/ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="https://www.tiktok.com/@ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="hover:opacity-60 transition-opacity"><Music2 className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="https://www.pinterest.com/ezhomeshopen" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" className="hover:opacity-60 transition-opacity"><ParkingCircle className="w-5 h-5" strokeWidth={1.5} /></a>
-            <a href="#" aria-label="YouTube" className="hover:opacity-60 transition-opacity"><Youtube className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="Twitter" className="hover:opacity-60 transition-opacity"><Twitter className="w-5 h-5" strokeWidth={1.5} /></a>
           </div>
         </div>
