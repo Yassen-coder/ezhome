@@ -15,7 +15,7 @@ const Footer = () => {
           </p>
           <div className="flex items-center gap-4 mt-6">
             <a href="https://www.instagram.com/ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} /></a>
-            <a href="https://www.tiktok.com/@ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="tiktok" className="hover:opacity-60 transition-opacity"><tiktok className="w-5 h-5" strokeWidth={1.5} /></a>
+            <a href="https://www.tiktok.com/@ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="hover:opacity-60 transition-opacity"><Music2 className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="YouTube" className="hover:opacity-60 transition-opacity"><Youtube className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="Twitter" className="hover:opacity-60 transition-opacity"><Twitter className="w-5 h-5" strokeWidth={1.5} /></a>
           </div>
