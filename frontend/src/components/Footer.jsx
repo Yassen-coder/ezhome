@@ -14,7 +14,7 @@ const Footer = () => {
             Curated essentials for kitchen, cleaning, organization, smart home, decor, and daily living — all in one place.
           </p>
           <div className="flex items-center gap-4 mt-6">
-            <a href="#" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} https://www.instagram.com/ezhome.shop?igsh=MWhyY2JyZTI3aXVocA==></a>
+            <a href="#" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="TikTok" className="hover:opacity-60 transition-opacity"><Music2 className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="YouTube" className="hover:opacity-60 transition-opacity"><Youtube className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="Twitter" className="hover:opacity-60 transition-opacity"><Twitter className="w-5 h-5" strokeWidth={1.5} /></a>
