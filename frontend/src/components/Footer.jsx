@@ -51,7 +51,7 @@ const Footer = () => {
       <div className="border-t border-border">
         <div className="container-px mx-auto max-w-[1400px] py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} EzHome. All rights reserved.</p>
-          <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> ezhome@seznam.cz</p>
+          <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> hello@exhome.shop</p>
           <p>As an Amazon Associate, EzHome earns from qualifying purchases.</p>
         </div>
       </div>

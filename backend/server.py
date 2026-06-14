@@ -7,6 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import secrets
+import re
 import httpx
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
@@ -33,6 +34,8 @@ JWT_ALGO = "HS256"
 ACCESS_TOKEN_TTL_MIN = 60  # 1 hour
 LOGIN_MAX_ATTEMPTS = 5
 LOGIN_LOCKOUT_MIN = 15
+AUTO_ADD_SECRET = os.environ.get("AUTO_ADD_SECRET")
+LANDING_BASE_URL = os.environ.get("LANDING_BASE_URL", "https://ezhome-shop.com")
 
 app = FastAPI(title="EzHome Affiliate API")
 api_router = APIRouter(prefix="/api")
@@ -83,6 +86,33 @@ async def get_current_admin(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user
+
+
+async def verify_auto_add_token(
+    creds: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
+) -> None:
+    if not AUTO_ADD_SECRET:
+        raise HTTPException(status_code=401, detail="Not authorized")
+    if not creds or not creds.credentials:
+        raise HTTPException(status_code=401, detail="Not authorized")
+    if not secrets.compare_digest(creds.credentials, AUTO_ADD_SECRET):
+        raise HTTPException(status_code=401, detail="Not authorized")
+
+
+def slugify_title(title: str) -> str:
+    slug = re.sub(r"[^\w\s-]", "", title.lower().strip())
+    slug = re.sub(r"[-\s]+", "-", slug).strip("-")
+    return slug or str(uuid.uuid4())[:8]
+
+
+async def unique_product_slug(title: str) -> str:
+    base = slugify_title(title)
+    slug = base
+    n = 2
+    while await db.products.find_one({"slug": slug}, {"_id": 1}):
+        slug = f"{base}-{n}"
+        n += 1
+    return slug
 
 
 # ============== MODELS ==============
@@ -151,6 +181,37 @@ class ProductUpdate(BaseModel):
     is_trending: Optional[bool] = None
     is_best_seller: Optional[bool] = None
     is_daily_deal: Optional[bool] = None
+
+
+AUTO_ADD_CATEGORIES = frozenset({
+    "kitchen", "cleaning", "organization", "smart-home", "decor", "daily-essentials",
+})
+AUTO_ADD_SOURCES = frozenset({"amazon", "shein", "aliexpress"})
+
+
+class ProductAutoAdd(BaseModel):
+    title: str
+    short_description: str
+    description: str = ""
+    images: List[str] = Field(min_length=1)
+    video: Optional[str] = None
+    affiliate_url: str
+    category: str
+    source: str
+    original_price: float
+    discounted_price: Optional[float] = None
+    rating: float = 4.5
+    review_count: int = 0
+    tags: Optional[str] = None
+    featured: bool = False
+    trending: bool = False
+
+
+class ProductAutoAddResponse(BaseModel):
+    success: bool = True
+    product_id: str
+    slug: str
+    landing_page_url: str
 
 
 class NewsletterSubscribe(BaseModel):
@@ -433,6 +494,50 @@ async def create_product(payload: ProductCreate, _: dict = Depends(get_current_a
     doc['created_at'] = doc['created_at'].isoformat()
     await db.products.insert_one(doc)
     return normalize_product_dict(doc)
+
+
+@api_router.post("/products/auto-add", response_model=ProductAutoAddResponse)
+async def auto_add_product(payload: ProductAutoAdd, _: None = Depends(verify_auto_add_token)):
+    if payload.category not in AUTO_ADD_CATEGORIES:
+        raise HTTPException(status_code=422, detail=f"Invalid category. Allowed: {', '.join(sorted(AUTO_ADD_CATEGORIES))}")
+    if payload.source not in AUTO_ADD_SOURCES:
+        raise HTTPException(status_code=422, detail=f"Invalid source. Allowed: {', '.join(sorted(AUTO_ADD_SOURCES))}")
+
+    slug = await unique_product_slug(payload.title)
+    discounted = payload.discounted_price if payload.discounted_price is not None else payload.original_price
+    badges = [payload.tags.strip()] if payload.tags and payload.tags.strip() else []
+
+    raw = {
+        "title": payload.title,
+        "short_description": payload.short_description,
+        "description": payload.description,
+        "image_url": payload.images[0],
+        "image_urls": payload.images,
+        "video_url": payload.video,
+        "category": payload.category,
+        "source": payload.source,
+        "affiliate_url": payload.affiliate_url,
+        "original_price": payload.original_price,
+        "discounted_price": discounted,
+        "rating": payload.rating,
+        "review_count": payload.review_count,
+        "badges": badges,
+        "is_trending": payload.trending,
+        "is_best_seller": payload.featured,
+        "slug": slug,
+    }
+    data = normalize_product_dict(raw)
+    product = Product(**data)
+    doc = product.model_dump()
+    doc["slug"] = slug
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.products.insert_one(doc)
+
+    return ProductAutoAddResponse(
+        product_id=product.id,
+        slug=slug,
+        landing_page_url=f"{LANDING_BASE_URL.rstrip('/')}/products/{slug}",
+    )
 
 
 @api_router.patch("/products/{product_id}", response_model=Product)
