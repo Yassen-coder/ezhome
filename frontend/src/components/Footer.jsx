@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Music2, Youtube, Twitter, Mail } from "lucide-react";
+import { Instagram, Music2, Twitter, ParkingCircle, Mail } from "lucide-react";
 import { SITE_CATEGORIES, categoryPath } from "../lib/categories";
 
 const Footer = () => {
@@ -14,9 +14,9 @@ const Footer = () => {
             Curated essentials for kitchen, cleaning, organization, smart home, decor, and daily living — all in one place.
           </p>
           <div className="flex items-center gap-4 mt-6">
-            <a href="#" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} /></a>
-            <a href="#" aria-label="TikTok" className="hover:opacity-60 transition-opacity"><Music2 className="w-5 h-5" strokeWidth={1.5} /></a>
-            <a href="#" aria-label="YouTube" className="hover:opacity-60 transition-opacity"><Youtube className="w-5 h-5" strokeWidth={1.5} /></a>
+            <a href="https://www.instagram.com/ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-60 transition-opacity"><Instagram className="w-5 h-5" strokeWidth={1.5} /></a>
+            <a href="https://www.tiktok.com/@ezhome.shop" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="hover:opacity-60 transition-opacity"><Music2 className="w-5 h-5" strokeWidth={1.5} /></a>
+            <a href="https://www.pinterest.com/ezhomeshopen" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" className="hover:opacity-60 transition-opacity"><ParkingCircle className="w-5 h-5" strokeWidth={1.5} /></a>
             <a href="#" aria-label="Twitter" className="hover:opacity-60 transition-opacity"><Twitter className="w-5 h-5" strokeWidth={1.5} /></a>
           </div>
         </div>
@@ -51,7 +51,7 @@ const Footer = () => {
       <div className="border-t border-border">
         <div className="container-px mx-auto max-w-[1400px] py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} EzHome. All rights reserved.</p>
-          <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> hello@exhome.shop</p>
+          <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> ezhome@seznam.cz</p>
           <p>As an Amazon Associate, EzHome earns from qualifying purchases.</p>
         </div>
       </div>
