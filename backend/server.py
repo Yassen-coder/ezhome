@@ -619,6 +619,31 @@ async def subscribe(payload: NewsletterSubscribe):
     doc = sub.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.newsletter.insert_one(doc)
+
+    # Notify site owner of the new subscriber
+    contact_email = os.environ.get("CONTACT_EMAIL", "dxnyementaiz@gmail.com")
+    await send_email_via_resend(
+        to=contact_email,
+        subject="New EzHome Newsletter Subscriber",
+        html=f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #1a1a1a;">New Newsletter Subscriber 🎉</h2>
+            <p style="font-size: 15px; color: #333;">Someone just subscribed to the EzHome newsletter:</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                <tr>
+                    <td style="padding: 10px 8px; font-weight: bold; width: 80px;">Email:</td>
+                    <td style="padding: 10px 8px; color: #1a1a1a;">{payload.email}</td>
+                </tr>
+                <tr style="background: #f5f5f5;">
+                    <td style="padding: 10px 8px; font-weight: bold;">Time:</td>
+                    <td style="padding: 10px 8px; color: #555;">{doc['created_at']}</td>
+                </tr>
+            </table>
+            <p style="margin-top: 16px; font-size: 13px; color: #888;">This notification was sent automatically by EzHome.</p>
+        </div>
+        """
+    )
+
     return {"ok": True, "already_subscribed": False}
 
 
