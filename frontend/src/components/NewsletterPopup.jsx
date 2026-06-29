@@ -57,7 +57,7 @@ const NewsletterPopup = () => {
         </div>
         <div className="p-8 sm:p-10">
           <p className="overline text-muted-foreground mb-3">Join the Club</p>
-          <h3 className="font-display text-2xl sm:text-3xl font-bold leading-tight">Get $10 off your first find.</h3>
+          <h3 className="font-display text-2xl sm:text-3xl font-bold leading-tight">Be the first to know!</h3>
           <p className="mt-3 text-sm text-muted-foreground">Weekly curated drops, viral deals, and members-only finds — straight to your inbox.</p>
           {submitted ? (
             <p className="mt-6 font-medium text-accent">You're in. Welcome to EzHome.</p>
@@ -78,7 +78,7 @@ const NewsletterPopup = () => {
                 className="px-6 py-3 bg-foreground text-background text-sm font-medium tracking-wide hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
                 data-testid="newsletter-submit-button"
               >
-                {loading ? "..." : "Claim $10"}
+                {loading ? "..." : "Subscribe Now"}
               </button>
             </form>
           )}
