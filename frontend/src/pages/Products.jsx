@@ -7,7 +7,7 @@ import { PageLoading, PageError, PageEmpty } from "../components/PageState";
 const SOURCES = [
   { key: "all", label: "All" },
   { key: "amazon", label: "Amazon" },
-  { key: "temu", label: "Temu" },
+  { key: "aliexpress", label: "AliExpress" },
   { key: "shein", label: "SHEIN" },
 ];
 

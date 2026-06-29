@@ -4,7 +4,7 @@ import { CATEGORY_SLUGS } from "../../lib/categories";
 import { getProductImages } from "../../lib/productImages";
 
 const CATEGORIES = CATEGORY_SLUGS;
-const SOURCES = ["amazon", "temu", "shein"];
+const SOURCES = ["amazon", "aliexpress", "shein"];
 
 const empty = {
   title: "",

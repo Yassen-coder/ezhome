@@ -7,7 +7,7 @@ import AnimatedPromoBadge from "./AnimatedPromoBadge";
 
 const SOURCE_LABEL = {
   amazon: "Amazon",
-  temu: "Temu",
+  aliexpress: "AliExpress",
   shein: "SHEIN",
 };
 

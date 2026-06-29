@@ -94,7 +94,7 @@ const Hero = () => {
             Shop <span className="text-accent">smarter.</span>
           </h1>
           <p className="mt-6 sm:mt-8 text-base sm:text-lg text-muted-foreground max-w-md leading-relaxed">
-            Hand-picked essentials from Amazon, Temu, and SHEIN — curated for the modern home.
+            Hand-picked essentials from Amazon, AliExpress, and SHEIN — curated for the modern home.
           </p>
           <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3">
             {main?.cta_link ? (

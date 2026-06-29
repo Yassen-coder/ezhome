@@ -17,7 +17,7 @@ const Privacy = () => (
       </section>
       <section>
         <h2 className="font-display text-2xl font-bold mb-3">Cookies</h2>
-        <p className="text-muted-foreground">We use first-party cookies for site functionality and third-party cookies (Amazon, Temu, SHEIN) for affiliate attribution. You can disable these in your browser.</p>
+        <p className="text-muted-foreground">We use first-party cookies for site functionality and third-party cookies (Amazon, AliExpress, SHEIN) for affiliate attribution. You can disable these in your browser.</p>
       </section>
       <section>
         <h2 className="font-display text-2xl font-bold mb-3">Your rights</h2>

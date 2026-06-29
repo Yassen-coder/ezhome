@@ -11,7 +11,7 @@ import { PageError } from "../components/PageState";
 
 const SOURCE_LABEL = {
   amazon: "Amazon",
-  temu: "Temu",
+  aliexpress: "AliExpress",
   shein: "SHEIN",
 };
 
