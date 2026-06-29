@@ -621,7 +621,7 @@ async def subscribe(payload: NewsletterSubscribe):
     await db.newsletter.insert_one(doc)
 
     # Notify site owner of the new subscriber
-    contact_email = os.environ.get("CONTACT_EMAIL", "dxnyementaiz@gmail.com")
+    contact_email = os.environ.get("CONTACT_EMAIL", "ezhome@seznam.cz")
     await send_email_via_resend(
         to=contact_email,
         subject="New EzHome Newsletter Subscriber",
@@ -655,7 +655,7 @@ async def contact(payload: ContactCreate):
     doc['created_at'] = doc['created_at'].isoformat()
     await db.contacts.insert_one(doc)
 
-    contact_email = os.environ.get("CONTACT_EMAIL", "dxnyementaiz@gmail.com")
+    contact_email = os.environ.get("CONTACT_EMAIL", "ezhome@seznam.cz")
     await send_email_via_resend(
         to=contact_email,
         subject=f"New message from EzHome — {payload.name}",
