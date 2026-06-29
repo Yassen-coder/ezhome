@@ -97,23 +97,14 @@ const Hero = () => {
             Hand-picked essentials from Amazon, AliExpress, and SHEIN — curated for the modern home.
           </p>
           <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3">
-            {main?.cta_link ? (
-              <CtaLink
-                to={main.cta_link}
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-foreground text-background font-medium text-sm tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground"
-                testId="hero-cta-shop"
-              >
-                {main.cta_text || "Shop Now"} <ArrowRight className="w-4 h-4" />
-              </CtaLink>
-            ) : (
-              <Link
-                to="/products"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-foreground text-background font-medium text-sm tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground"
-                data-testid="hero-cta-shop"
-              >
-                Shop Now <ArrowRight className="w-4 h-4" />
-              </Link>
-            )}
+            {/* Primary CTA — always fixed to 'Shop Now' / /products, independent of banner rotation */}
+            <Link
+              to="/products"
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-foreground text-background font-medium text-sm tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground"
+              data-testid="hero-cta-shop"
+            >
+              Shop Now <ArrowRight className="w-4 h-4" />
+            </Link>
             <Link
               to="/deals"
               className="inline-flex items-center justify-center px-7 py-4 border border-foreground text-foreground font-medium text-sm tracking-wide transition-all duration-300 hover:bg-foreground hover:text-background"

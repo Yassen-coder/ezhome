@@ -903,7 +903,7 @@ def _category_banner_defaults():
             "title": title,
             "subtitle": subtitle,
             "image_url": img,
-            "cta_text": "Explore",
+            "cta_text": "Shop Now",
             "cta_link": f"/category/{slug}",
             "position": "category",
             "order": order,
