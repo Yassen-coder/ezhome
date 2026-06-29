@@ -111,7 +111,7 @@ const Hero = () => {
                 className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-foreground text-background font-medium text-sm tracking-wide transition-all duration-300 hover:bg-accent hover:text-accent-foreground"
                 data-testid="hero-cta-shop"
               >
-                Shop the Collection <ArrowRight className="w-4 h-4" />
+                Shop Now <ArrowRight className="w-4 h-4" />
               </Link>
             )}
             <Link

@@ -12,7 +12,8 @@ const DEFAULTS = {
 const SettingsContext = createContext({ ...DEFAULTS, refetchSettings: async () => {}, settingsLoading: true });
 
 export const SettingsProvider = ({ children }) => {
-  const [settings, setSettings] = useState(DEFAULTS);
+  // Start with null so no stale value renders before the first fetch completes
+  const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const refetchSettings = useCallback(async () => {
@@ -20,7 +21,8 @@ export const SettingsProvider = ({ children }) => {
       const { data } = await api.get("/settings");
       setSettings({ ...DEFAULTS, ...data });
     } catch {
-      // Keep previous settings on fetch failure
+      // On failure, use DEFAULTS so the UI is never blank
+      setSettings((prev) => prev ?? DEFAULTS);
     } finally {
       setLoading(false);
     }
@@ -36,7 +38,9 @@ export const SettingsProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [refetchSettings]);
 
-  const value = { ...settings, refetchSettings, settingsLoading: loading };
+  // While loading and no data yet, expose DEFAULTS so hooks never get undefined fields
+  const resolved = settings ?? DEFAULTS;
+  const value = { ...resolved, refetchSettings, settingsLoading: loading };
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 };
 

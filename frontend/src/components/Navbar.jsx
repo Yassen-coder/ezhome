@@ -10,8 +10,7 @@ import { NAV_CATEGORY_LINKS } from "../lib/categories";
 
 const Navbar = () => {
   const { theme, toggle } = useTheme();
-  const settings = useSettings();
-  const announcement_text = settings?.announcement_text || "FREE GLOBAL SHIPPING ON ORDERS $50+ · NEW DROPS WEEKLY";
+  const { announcement_text, settingsLoading } = useSettings();
   const [openSearch, setOpenSearch] = useState(false);
   const [q, setQ] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -29,13 +28,15 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Announcement bar */}
-      <div
-        className="bg-foreground text-background text-[10px] sm:text-sm py-2 text-center font-medium tracking-wider px-4"
-        data-testid="announcement-bar"
-      >
-        {announcement_text}
-      </div>
+      {/* Announcement bar — hidden until settings load to prevent value flash */}
+      {!settingsLoading && (
+        <div
+          className="bg-foreground text-background text-[10px] sm:text-sm py-2 text-center font-medium tracking-wider px-4"
+          data-testid="announcement-bar"
+        >
+          {announcement_text}
+        </div>
+      )}
 
       <header
         className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border"
